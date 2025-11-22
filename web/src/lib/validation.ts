@@ -42,6 +42,32 @@ export const profileSchema = z.object({
   github_url: z.string().url('올바른 URL 형식이 아닙니다').optional().or(z.literal('')),
 })
 
+// Idea schema
+export const ideaSchema = z.object({
+  title: z
+    .string()
+    .min(5, '제목은 최소 5자 이상이어야 합니다')
+    .max(200, '제목은 200자 이내로 작성해주세요'),
+  content: z
+    .string()
+    .min(20, '내용은 최소 20자 이상이어야 합니다')
+    .max(10000, '내용은 10000자 이내로 작성해주세요'),
+  category: z.string().min(1, '카테고리를 선택해주세요'),
+  tags: z.array(z.string()).default([]),
+  status: z.enum(['recruiting', 'in_progress', 'completed', 'closed']).default('recruiting'),
+  required_roles: z.array(z.string()).default([]),
+})
+
+// Comment schema
+export const commentSchema = z.object({
+  content: z
+    .string()
+    .min(1, '댓글 내용을 입력해주세요')
+    .max(1000, '댓글은 1000자 이내로 작성해주세요'),
+})
+
 export type SignUpFormData = z.infer<typeof signUpSchema>
 export type SignInFormData = z.infer<typeof signInSchema>
 export type ProfileFormData = z.infer<typeof profileSchema>
+export type IdeaFormData = z.infer<typeof ideaSchema>
+export type CommentFormData = z.infer<typeof commentSchema>
