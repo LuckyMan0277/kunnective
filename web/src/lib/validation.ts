@@ -66,8 +66,36 @@ export const commentSchema = z.object({
     .max(1000, '댓글은 1000자 이내로 작성해주세요'),
 })
 
+// Project schema
+export const projectSchema = z.object({
+  title: z
+    .string()
+    .min(5, '제목은 최소 5자 이상이어야 합니다')
+    .max(200, '제목은 200자 이내로 작성해주세요'),
+  description: z
+    .string()
+    .min(20, '설명은 최소 20자 이상이어야 합니다')
+    .max(5000, '설명은 5000자 이내로 작성해주세요'),
+  category: z.string().min(1, '카테고리를 선택해주세요'),
+  tags: z.array(z.string()).default([]),
+  status: z.enum(['recruiting', 'in_progress', 'completed', 'on_hold']).default('recruiting'),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
+  github_url: z.string().url('올바른 URL 형식이 아닙니다').optional().or(z.literal('')),
+  demo_url: z.string().url('올바른 URL 형식이 아닙니다').optional().or(z.literal('')),
+  max_members: z.number().min(2).max(50).default(10),
+})
+
+// Application schema
+export const applicationSchema = z.object({
+  role: z.string().min(1, '지원 역할을 입력해주세요'),
+  message: z.string().max(1000, '지원 메시지는 1000자 이내로 작성해주세요').optional(),
+})
+
 export type SignUpFormData = z.infer<typeof signUpSchema>
 export type SignInFormData = z.infer<typeof signInSchema>
 export type ProfileFormData = z.infer<typeof profileSchema>
 export type IdeaFormData = z.infer<typeof ideaSchema>
 export type CommentFormData = z.infer<typeof commentSchema>
+export type ProjectFormData = z.infer<typeof projectSchema>
+export type ApplicationFormData = z.infer<typeof applicationSchema>
