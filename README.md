@@ -2,10 +2,20 @@
 
 > 건국대학교 학생들을 위한 아이디어 공유, 팀원 매칭, 프로젝트 협업 플랫폼
 
-[![Next.js](https://img.shields.io/badge/Next.js-14+-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.5-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green)](https://supabase.com/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0+-38B2AC)](https://tailwindcss.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC)](https://tailwindcss.com/)
+
+## 🎉 개발 현황
+
+### ✅ 완료된 Phase (100%)
+- **Phase 0**: 환경 설정 ✅
+- **Phase 1**: 인증 & 프로필 ✅
+- **Phase 2**: 아이디어 게시판 ✅
+- **Phase 3**: 프로젝트 & 매칭 시스템 ✅
+
+**총 코드 라인**: 6,015줄 | **총 커밋**: 12개 | **총 파일**: 42개
 
 ## 📌 프로젝트 소개
 

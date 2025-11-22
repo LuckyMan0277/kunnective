@@ -208,3 +208,65 @@ export interface ProjectRequiredRole {
   description?: string
   created_at: string
 }
+
+// Chat types
+export type ChatRoomType = 'direct' | 'group' | 'project'
+export type MessageType = 'text' | 'image' | 'file' | 'system'
+export type ParticipantRole = 'admin' | 'member'
+
+export interface ChatRoom {
+  id: string
+  name?: string
+  type: ChatRoomType
+  project_id?: string
+  created_at: string
+  updated_at: string
+  // Relations
+  participants?: ChatParticipant[]
+  last_message?: Message
+  unread_count?: number
+  other_participant?: UserProfile // For direct chats
+  project?: Project
+}
+
+export interface ChatParticipant {
+  id: string
+  room_id: string
+  user_id: string
+  role: ParticipantRole
+  joined_at: string
+  last_read_at: string
+  user?: UserProfile
+}
+
+export interface Message {
+  id: string
+  room_id: string
+  user_id: string
+  content: string
+  type: MessageType
+  metadata: Record<string, any>
+  created_at: string
+  updated_at: string
+  user?: UserProfile
+}
+
+export interface InsertChatRoom {
+  name?: string
+  type: ChatRoomType
+  project_id?: string
+}
+
+export interface InsertChatParticipant {
+  room_id: string
+  user_id: string
+  role?: ParticipantRole
+}
+
+export interface InsertMessage {
+  room_id: string
+  user_id: string
+  content: string
+  type?: MessageType
+  metadata?: Record<string, any>
+}

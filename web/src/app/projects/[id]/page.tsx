@@ -12,6 +12,7 @@ import {
   UserPlus,
   Send,
   Settings,
+  MessageCircle,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Project, ProjectMember, ProjectApplication } from '@/types'
@@ -125,6 +126,63 @@ export default function ProjectDetailPage({
     setIsMember(!!memberData)
   }
 
+  const handleJoinChat = async () => {
+    if (!currentUserId) {
+      router.push('/login')
+      return
+    }
+
+    try {
+      // Check if project chat room exists
+      const { data: existingRoom } = await supabase
+        .from('chat_rooms')
+        .select('id')
+        .eq('type', 'project')
+        .eq('project_id', params.id)
+        .single()
+
+      if (existingRoom) {
+        router.push(`/chat/${existingRoom.id}`)
+        return
+      }
+
+      // Create project chat room
+      const { data: newRoom, error: roomError } = await supabase
+        .from('chat_rooms')
+        .insert({
+          name: project?.title,
+          type: 'project',
+          project_id: params.id,
+        })
+        .select()
+        .single()
+
+      if (roomError) throw roomError
+
+      // Add all project members as participants
+      const memberIds = [
+        project?.owner_id,
+        ...(members?.map((m) => m.user_id) || []),
+      ]
+
+      const participants = memberIds.map((userId) => ({
+        room_id: newRoom.id,
+        user_id: userId,
+        role: userId === project?.owner_id ? 'admin' : 'member',
+      }))
+
+      const { error: participantsError } = await supabase
+        .from('chat_participants')
+        .insert(participants)
+
+      if (participantsError) throw participantsError
+
+      router.push(`/chat/${newRoom.id}`)
+    } catch (error: any) {
+      alert(error.message || '채팅방 생성 실패')
+    }
+  }
+
   const handleApply = async () => {
     if (!currentUserId) {
       router.push('/login')
@@ -233,14 +291,22 @@ export default function ProjectDetailPage({
                   </div>
                   <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
                 </div>
-                {isOwner && (
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={`/projects/${project.id}/manage`}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      관리
-                    </Link>
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {(isOwner || isMember) && (
+                    <Button variant="outline" size="sm" onClick={handleJoinChat}>
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      팀 채팅
+                    </Button>
+                  )}
+                  {isOwner && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/projects/${project.id}/manage`}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        관리
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* Project Info */}
