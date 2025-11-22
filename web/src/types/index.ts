@@ -270,3 +270,41 @@ export interface InsertMessage {
   type?: MessageType
   metadata?: Record<string, any>
 }
+
+// Notification types
+export type NotificationType =
+  | 'application_accepted'
+  | 'application_rejected'
+  | 'new_application'
+  | 'scout_received'
+  | 'scout_accepted'
+  | 'scout_rejected'
+  | 'idea_liked'
+  | 'idea_commented'
+  | 'project_invite'
+  | 'new_message'
+  | 'member_joined'
+  | 'member_left'
+  | 'project_update'
+  | 'system'
+
+export interface Notification {
+  id: string
+  user_id: string
+  type: NotificationType
+  title: string
+  message: string
+  link_url?: string
+  metadata: Record<string, any>
+  is_read: boolean
+  created_at: string
+}
+
+export interface InsertNotification {
+  user_id: string
+  type: NotificationType
+  title: string
+  message: string
+  link_url?: string
+  metadata?: Record<string, any>
+}
