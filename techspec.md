@@ -627,13 +627,13 @@ project-maker/
 
 ### Phase 0: 환경 설정 (1일)
 - [x] 프로젝트 디렉토리 구조 생성
-- [ ] pnpm workspace 설정
-- [ ] Next.js 프로젝트 초기화
-- [ ] TypeScript, Tailwind CSS 설정
-- [ ] Supabase 프로젝트 생성 및 연동
-- [ ] Git 저장소 초기화
-- [ ] shadcn/ui 설치
-- [ ] 기본 레이아웃 및 테마 설정
+- [x] pnpm workspace 설정
+- [x] Next.js 프로젝트 초기화
+- [x] TypeScript, Tailwind CSS 설정
+- [x] Supabase 프로젝트 생성 및 연동
+- [x] Git 저장소 초기화
+- [x] shadcn/ui 설치
+- [x] 기본 레이아웃 및 테마 설정
 
 ### Phase 1: 인증 & 프로필 (1주)
 - [ ] Supabase Auth 연동
