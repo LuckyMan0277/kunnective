@@ -667,14 +667,14 @@ project-maker/
 - [x] 팀원 수락/거절
 - [x] 프로젝트 멤버 관리
 
-### Phase 4: 채팅 시스템 (1-2주)
-- [ ] 데이터베이스 스키마 (chat_rooms, messages, participants)
-- [ ] 채팅방 목록
-- [ ] 1:1 채팅 UI
-- [ ] 그룹 채팅 UI
-- [ ] 실시간 메시지 전송/수신 (Supabase Realtime)
-- [ ] 읽음 표시
-- [ ] 메시지 페이지네이션
+### Phase 4: 채팅 시스템 (1-2주) ✅
+- [x] 데이터베이스 스키마 (chat_rooms, messages, participants)
+- [x] 채팅방 목록
+- [x] 1:1 채팅 UI
+- [x] 그룹 채팅 UI
+- [x] 실시간 메시지 전송/수신 (Supabase Realtime)
+- [x] 읽음 표시
+- [x] 메시지 페이지네이션
 
 ### Phase 5: 알림 시스템 (1주)
 - [ ] 데이터베이스 스키마 (notifications)
