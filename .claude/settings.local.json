@@ -8,7 +8,9 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial project setup - Phase 0\n\n- Setup pnpm workspace configuration\n- Initialize Next.js 15 project with TypeScript\n- Configure Tailwind CSS and shadcn/ui theme\n- Setup Supabase client and server instances\n- Add authentication middleware\n- Create basic project structure\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit:*)",
       "Bash(/c/Users/jaeyun/AppData/Local/Programs/Claude/resources/app.asar.unpacked/node_modules/.bin/claude compact:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx create-expo-app@latest:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
