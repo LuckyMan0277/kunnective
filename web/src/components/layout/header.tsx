@@ -60,12 +60,12 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold text-xl">KU-Connect</span>
+      <div className="container flex h-14 max-w-screen-2xl items-center px-4">
+        <div className="mr-2 md:mr-4 flex">
+          <Link href="/" className="mr-2 md:mr-6 flex items-center space-x-2">
+            <span className="font-bold text-lg md:text-xl">Kunnective</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 text-sm font-medium">
             <Link
               href="/ideas"
               className="transition-colors hover:text-foreground/80"
@@ -88,18 +88,18 @@ export function Header() {
             )}
           </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-end space-x-1 md:space-x-2">
           {!loading && (
-            <nav className="flex items-center space-x-2">
+            <nav className="flex items-center space-x-1 md:space-x-2">
               {user ? (
                 <>
                   <Button variant="ghost" size="icon" asChild className="relative">
                     <Link href="/notifications">
-                      <Bell className="h-5 w-5" />
+                      <Bell className="h-4 w-4 md:h-5 md:w-5" />
                       {unreadCount > 0 && (
                         <Badge
                           variant="destructive"
-                          className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                          className="absolute -top-1 -right-1 h-4 w-4 md:h-5 md:w-5 p-0 flex items-center justify-center text-[10px] md:text-xs"
                         >
                           {unreadCount > 9 ? '9+' : unreadCount}
                         </Badge>
@@ -107,18 +107,18 @@ export function Header() {
                       <span className="sr-only">알림</span>
                     </Link>
                   </Button>
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" asChild className="hidden sm:inline-flex">
                     <Link href="/profile">프로필</Link>
                   </Button>
                   <LogoutButton />
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" asChild size="sm" className="text-xs md:text-sm">
                     <Link href="/login">로그인</Link>
                   </Button>
-                  <Button asChild>
-                    <Link href="/signup">회원가입</Link>
+                  <Button asChild size="sm" className="text-xs md:text-sm">
+                    <Link href="/signup">가입</Link>
                   </Button>
                 </>
               )}

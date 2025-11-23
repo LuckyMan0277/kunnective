@@ -56,7 +56,7 @@ export default function LoginPage() {
       <CardHeader>
         <CardTitle>로그인</CardTitle>
         <CardDescription>
-          KU-Connect에 오신 것을 환영합니다
+          Kunnective에 오신 것을 환영합니다
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>

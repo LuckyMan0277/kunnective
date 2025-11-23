@@ -6,22 +6,22 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="container flex flex-col items-center gap-4 py-24 md:py-32">
+      <section className="container flex flex-col items-center gap-4 py-12 md:py-24 lg:py-32 px-4">
         <div className="flex max-w-[980px] flex-col items-center gap-4 text-center">
-          <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-6xl lg:leading-[1.1]">
+          <h1 className="text-2xl font-bold leading-tight tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl lg:leading-[1.1]">
             건국대생들의 아이디어가
             <br className="hidden sm:inline" />
             프로젝트로 실현됩니다
           </h1>
-          <p className="max-w-[750px] text-lg text-muted-foreground sm:text-xl">
+          <p className="max-w-[750px] text-base text-muted-foreground sm:text-lg md:text-xl px-4">
             아이디어를 공유하고, 함께할 팀원을 찾고, 프로젝트를 시작하세요.
-            KU-Connect에서 당신의 꿈을 현실로 만드세요.
+            Kunnective에서 당신의 꿈을 현실로 만드세요.
           </p>
-          <div className="flex gap-4">
-            <Button size="lg" asChild>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4">
+            <Button size="lg" asChild className="w-full sm:w-auto">
               <Link href="/signup">시작하기</Link>
             </Button>
-            <Button size="lg" variant="outline" asChild>
+            <Button size="lg" variant="outline" asChild className="w-full sm:w-auto">
               <Link href="/ideas">아이디어 둘러보기</Link>
             </Button>
           </div>
@@ -29,8 +29,8 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="container py-16 md:py-24">
-        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+      <section className="container py-12 md:py-16 lg:py-24 px-4">
+        <div className="mx-auto grid max-w-5xl gap-4 sm:gap-6 grid-cols-1 md:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>아이디어 공유</CardTitle>

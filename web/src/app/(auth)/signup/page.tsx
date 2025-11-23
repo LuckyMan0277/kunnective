@@ -78,7 +78,7 @@ export default function SignUpPage() {
       <CardHeader>
         <CardTitle>회원가입</CardTitle>
         <CardDescription>
-          건국대 이메일로 가입하여 KU-Connect를 시작하세요
+          건국대 이메일로 가입하여 Kunnective를 시작하세요
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>

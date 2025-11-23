@@ -44,7 +44,7 @@ export default function App() {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{ title: 'KU-Connect' }}
+              options={{ title: 'Kunnective' }}
             />
             <Stack.Screen
               name="Ideas"
