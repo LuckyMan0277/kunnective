@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { IdeaCard } from '@/components/ideas/idea-card'
+import { IdeaCardSkeleton } from '@/components/ui/card-skeleton'
 
 const ITEMS_PER_PAGE = 12
 
@@ -196,8 +197,10 @@ export default function IdeasPage() {
 
       {/* Ideas Grid */}
       {loading && ideas.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          로딩 중...
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <IdeaCardSkeleton key={i} />
+          ))}
         </div>
       ) : ideas.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">

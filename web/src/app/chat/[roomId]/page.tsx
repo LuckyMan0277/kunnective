@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { useToast } from '@/lib/hooks/useToast'
 
 export default function ChatRoomPage({
   params,
@@ -25,6 +26,7 @@ export default function ChatRoomPage({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { toast } = useToast()
 
   useEffect(() => {
     loadChatRoom()
@@ -191,7 +193,11 @@ export default function ChatRoomPage({
       setNewMessage('')
       markAsRead()
     } catch (error: any) {
-      alert(error.message || '메시지 전송 실패')
+      toast({
+        variant: 'error',
+        title: '메시지 전송 실패',
+        description: error.message || '메시지 전송 중 오류가 발생했습니다',
+      })
     } finally {
       setSending(false)
     }

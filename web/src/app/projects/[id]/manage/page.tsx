@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useToast } from '@/lib/hooks/useToast'
 
 export default function ProjectManagePage({
   params,
@@ -34,6 +35,7 @@ export default function ProjectManagePage({
   const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('pending')
   const router = useRouter()
   const supabase = createClient()
+  const { toast } = useToast()
 
   useEffect(() => {
     loadProject()
@@ -132,9 +134,17 @@ export default function ProjectManagePage({
       }
 
       loadApplications()
-      alert(status === 'accepted' ? '지원자를 수락했습니다!' : '지원서를 거절했습니다.')
+      toast({
+        variant: 'success',
+        title: status === 'accepted' ? '지원 수락' : '지원 거절',
+        description: status === 'accepted' ? '지원자를 수락했습니다!' : '지원서를 거절했습니다.',
+      })
     } catch (error: any) {
-      alert(error.message || '처리 중 오류가 발생했습니다')
+      toast({
+        variant: 'error',
+        title: '처리 실패',
+        description: error.message || '처리 중 오류가 발생했습니다',
+      })
     }
   }
 

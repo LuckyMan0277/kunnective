@@ -26,6 +26,7 @@ import {
   CardHeader,
 } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
+import { useToast } from '@/lib/hooks/useToast'
 
 export default function IdeaDetailPage({ params }: { params: { id: string } }) {
   const [idea, setIdea] = useState<Idea | null>(null)
@@ -39,6 +40,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { toast } = useToast()
 
   useEffect(() => {
     loadIdea()
@@ -228,9 +230,13 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
       if (error) throw error
 
       router.push('/ideas')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting idea:', error)
-      alert('삭제 중 오류가 발생했습니다')
+      toast({
+        variant: 'error',
+        title: '삭제 실패',
+        description: error.message || '삭제 중 오류가 발생했습니다',
+      })
     }
   }
 

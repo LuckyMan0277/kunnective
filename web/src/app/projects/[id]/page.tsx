@@ -28,6 +28,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useToast } from '@/lib/hooks/useToast'
 
 export default function ProjectDetailPage({
   params,
@@ -46,6 +47,7 @@ export default function ProjectDetailPage({
   const [isMember, setIsMember] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const { toast } = useToast()
 
   useEffect(() => {
     loadProject()
@@ -179,7 +181,11 @@ export default function ProjectDetailPage({
 
       router.push(`/chat/${newRoom.id}`)
     } catch (error: any) {
-      alert(error.message || '채팅방 생성 실패')
+      toast({
+        variant: 'error',
+        title: '채팅방 생성 실패',
+        description: error.message || '채팅방 생성 중 오류가 발생했습니다',
+      })
     }
   }
 
@@ -190,7 +196,11 @@ export default function ProjectDetailPage({
     }
 
     if (!applicationRole.trim()) {
-      alert('지원 역할을 입력해주세요')
+      toast({
+        variant: 'warning',
+        title: '입력 필요',
+        description: '지원 역할을 입력해주세요',
+      })
       return
     }
 
@@ -206,13 +216,21 @@ export default function ProjectDetailPage({
 
       if (error) throw error
 
-      alert('지원서가 제출되었습니다!')
+      toast({
+        variant: 'success',
+        title: '지원 완료',
+        description: '지원서가 성공적으로 제출되었습니다!',
+      })
       setShowApplicationForm(false)
       setHasApplied(true)
       setApplicationRole('')
       setApplicationMessage('')
     } catch (error: any) {
-      alert(error.message || '지원 중 오류가 발생했습니다')
+      toast({
+        variant: 'error',
+        title: '지원 실패',
+        description: error.message || '지원 중 오류가 발생했습니다',
+      })
     } finally {
       setApplying(false)
     }
