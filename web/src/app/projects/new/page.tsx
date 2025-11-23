@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -45,7 +45,7 @@ const statusOptions = [
   { value: 'on_hold', label: '보류' },
 ]
 
-export default function NewProjectPage() {
+function NewProjectForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [tagInput, setTagInput] = useState('')
@@ -354,5 +354,13 @@ export default function NewProjectPage() {
         </form>
       </Card>
     </div>
+  )
+}
+
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<div className="container max-w-4xl py-8">로딩 중...</div>}>
+      <NewProjectForm />
+    </Suspense>
   )
 }
