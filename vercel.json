@@ -1,4 +1,7 @@
 {
   "framework": "nextjs",
+  "buildCommand": "cd web && npm install && npm run build",
+  "devCommand": "cd web && npm run dev",
+  "installCommand": "npm install",
   "regions": ["icn1"]
 }

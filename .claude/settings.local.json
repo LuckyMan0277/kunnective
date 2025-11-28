@@ -10,7 +10,21 @@
       "Bash(/c/Users/jaeyun/AppData/Local/Programs/Claude/resources/app.asar.unpacked/node_modules/.bin/claude compact:*)",
       "Bash(find:*)",
       "Bash(npx create-expo-app@latest:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git push:*)",
+      "Bash(grep:*)",
+      "Bash(git reset:*)",
+      "Bash(.gitignore)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npm run dev:*)",
+      "Bash(taskkill /F /PID 48312 2)",
+      "Bash(NUL)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(cat:*)",
+      "Bash(npm run build:*)",
+      "Bash(git rm:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []
