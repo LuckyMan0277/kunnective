@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserProfile } from '@/types'
+import type { UserProfile } from '@kunnective/shared'
 
 interface Review {
   id: string
@@ -76,9 +76,8 @@ export default function ReviewsPage() {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            }`}
+            className={`w-4 h-4 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+              }`}
           />
         ))}
       </div>
@@ -98,21 +97,19 @@ export default function ReviewsPage() {
       <div className="flex gap-2 mb-6 border-b border-border">
         <button
           onClick={() => setActiveTab('received')}
-          className={`px-4 py-2 font-medium transition ${
-            activeTab === 'received'
+          className={`px-4 py-2 font-medium transition ${activeTab === 'received'
               ? 'border-b-2 border-primary text-primary'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           받은 리뷰 ({receivedReviews.length})
         </button>
         <button
           onClick={() => setActiveTab('given')}
-          className={`px-4 py-2 font-medium transition ${
-            activeTab === 'given'
+          className={`px-4 py-2 font-medium transition ${activeTab === 'given'
               ? 'border-b-2 border-primary text-primary'
               : 'text-muted-foreground hover:text-foreground'
-          }`}
+            }`}
         >
           작성한 리뷰 ({givenReviews.length})
         </button>

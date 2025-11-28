@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserProfile } from '@/types'
+import type { UserProfile } from '@kunnective/shared'
 
 export default function ProfileEditPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)

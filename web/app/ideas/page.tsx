@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Plus, ThumbsUp, MessageCircle, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import type { Idea } from '@/types'
+import type { Idea } from '@kunnective/shared'
 
 export default function IdeasPage() {
   const [ideas, setIdeas] = useState<Idea[]>([])
@@ -147,11 +147,10 @@ export default function IdeasPage() {
           <div className="flex gap-2">
             <motion.button
               onClick={() => setSortBy('latest')}
-              className={`px-4 py-2 rounded-lg ${
-                sortBy === 'latest'
+              className={`px-4 py-2 rounded-lg ${sortBy === 'latest'
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border hover:bg-accent'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -159,11 +158,10 @@ export default function IdeasPage() {
             </motion.button>
             <motion.button
               onClick={() => setSortBy('popular')}
-              className={`px-4 py-2 rounded-lg ${
-                sortBy === 'popular'
+              className={`px-4 py-2 rounded-lg ${sortBy === 'popular'
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border hover:bg-accent'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -171,11 +169,10 @@ export default function IdeasPage() {
             </motion.button>
             <motion.button
               onClick={() => setSortBy('views')}
-              className={`px-4 py-2 rounded-lg ${
-                sortBy === 'views'
+              className={`px-4 py-2 rounded-lg ${sortBy === 'views'
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border hover:bg-accent'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >

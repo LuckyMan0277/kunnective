@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { validateKonkukEmail, validatePassword } from '@/lib/utils'
+import { validateKonkukEmail, validatePassword } from '@kunnective/shared'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')

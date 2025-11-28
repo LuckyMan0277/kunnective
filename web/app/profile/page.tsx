@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Edit, Github, Linkedin, Globe, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserProfile, Project } from '@/types'
+import type { UserProfile, Project } from '@kunnective/shared'
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -172,11 +172,10 @@ export default function ProfilePage() {
         <div className="mb-8 p-4 bg-secondary/50 rounded-lg">
           <div className="flex items-center justify-between">
             <span className="font-medium">프로젝트 참여 가능 여부</span>
-            <span className={`px-3 py-1 rounded-full ${
-              profile.available_for_projects
+            <span className={`px-3 py-1 rounded-full ${profile.available_for_projects
                 ? 'bg-green-100 text-green-800'
                 : 'bg-gray-100 text-gray-800'
-            }`}>
+              }`}>
               {profile.available_for_projects ? '✅ 가능' : '❌ 불가능'}
             </span>
           </div>
@@ -211,11 +210,10 @@ export default function ProfilePage() {
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold">{project.title}</h3>
-                    <span className={`px-2 py-1 text-xs rounded ${
-                      project.status === 'recruiting'
+                    <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-blue-100 text-blue-800'
-                    }`}>
+                      }`}>
                       {project.status === 'recruiting' ? '모집중' : '진행중'}
                     </span>
                   </div>

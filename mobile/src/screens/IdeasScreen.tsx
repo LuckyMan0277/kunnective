@@ -6,52 +6,86 @@ import {
   FlatList,
   TouchableOpacity,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../lib/supabase';
-import { Idea } from '../types';
+import { Idea } from '@kunnective/shared';
 
-export default function IdeasScreen() {
+export default function IdeasScreen({ navigation }: any) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
-    loadIdeas();
+    loadIdeas(0, true);
   }, []);
 
-  const loadIdeas = async () => {
-    const { data, error } = await supabase
-      .from('ideas')
-      .select(`
-        *,
-        user:users!ideas_user_id_fkey(id, name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(20);
+  const loadIdeas = async (pageNumber: number, isRefresh = false) => {
+    if (!isRefresh && !hasMore) return;
 
-    if (!error && data) {
-      setIdeas(data);
+    try {
+      const { data, error } = await supabase
+        .from('ideas')
+        .select(`
+          *,
+          author:users!ideas_author_id_fkey(id, name)
+        `)
+        .order('created_at', { ascending: false })
+        .range(pageNumber * PAGE_SIZE, (pageNumber + 1) * PAGE_SIZE - 1);
+
+      if (!error && data) {
+        if (isRefresh) {
+          setIdeas(data);
+        } else {
+          setIdeas((prev) => [...prev, ...data]);
+        }
+        setHasMore(data.length === PAGE_SIZE);
+        setPage(pageNumber);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadIdeas(0, true);
+  };
+
+  const handleLoadMore = () => {
+    if (!loading && hasMore) {
+      loadIdeas(page + 1);
+    }
   };
 
   const renderItem = ({ item }: { item: Idea }) => (
-    <View style={styles.card}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('IdeaDetail', { id: item.id })}
+    >
       <View style={styles.cardHeader}>
         <Text style={styles.category}>{item.category}</Text>
         <Text style={styles.status}>{getStatusLabel(item.status)}</Text>
       </View>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.content} numberOfLines={3}>
-        {item.content}
+        {item.description}
       </Text>
       <View style={styles.cardFooter}>
-        <Text style={styles.author}>{item.user?.name}</Text>
+        <Text style={styles.author}>{item.author?.name}</Text>
         <Text style={styles.views}>👁 {item.view_count}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
-  if (loading) {
+  if (loading && !refreshing && page === 0) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -60,17 +94,35 @@ export default function IdeasScreen() {
   }
 
   return (
-    <FlatList
-      data={ideas}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.list}
-      ListEmptyComponent={
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>아직 아이디어가 없습니다</Text>
-        </View>
-      }
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={ideas}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          hasMore && ideas.length > 0 ? (
+            <ActivityIndicator style={{ padding: 16 }} />
+          ) : null
+        }
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Text style={styles.emptyText}>아직 아이디어가 없습니다</Text>
+          </View>
+        }
+      />
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('CreateIdea')}
+      >
+        <Ionicons name="add" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -85,6 +137,10 @@ const getStatusLabel = (status: string) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -151,5 +207,21 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#999',
+  },
+  fab: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });

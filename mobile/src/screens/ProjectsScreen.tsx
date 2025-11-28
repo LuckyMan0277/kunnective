@@ -5,32 +5,63 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { Project } from '../types';
+import { Project } from '@kunnective/shared';
 
 export default function ProjectsScreen() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
-    loadProjects();
+    loadProjects(0, true);
   }, []);
 
-  const loadProjects = async () => {
-    const { data, error } = await supabase
-      .from('projects')
-      .select(`
-        *,
-        owner:users!projects_owner_id_fkey(id, name)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(20);
+  const loadProjects = async (pageNumber: number, isRefresh = false) => {
+    if (!isRefresh && !hasMore) return;
 
-    if (!error && data) {
-      setProjects(data);
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          owner:users!projects_owner_id_fkey(id, name)
+        `)
+        .order('created_at', { ascending: false })
+        .range(pageNumber * PAGE_SIZE, (pageNumber + 1) * PAGE_SIZE - 1);
+
+      if (!error && data) {
+        if (isRefresh) {
+          setProjects(data);
+        } else {
+          setProjects((prev) => [...prev, ...data]);
+        }
+        setHasMore(data.length === PAGE_SIZE);
+        setPage(pageNumber);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadProjects(0, true);
+  };
+
+  const handleLoadMore = () => {
+    if (!loading && hasMore) {
+      loadProjects(page + 1);
+    }
   };
 
   const renderItem = ({ item }: { item: Project }) => (
@@ -45,12 +76,12 @@ export default function ProjectsScreen() {
       </Text>
       <View style={styles.cardFooter}>
         <Text style={styles.owner}>{item.owner?.name}</Text>
-        <Text style={styles.members}>👥 {item.max_members}명</Text>
+        <Text style={styles.members}>👥 {item.max_members || 0}명</Text>
       </View>
     </View>
   );
 
-  if (loading) {
+  if (loading && !refreshing && page === 0) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -64,6 +95,16 @@ export default function ProjectsScreen() {
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.list}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+      onEndReached={handleLoadMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        hasMore && projects.length > 0 ? (
+          <ActivityIndicator style={{ padding: 16 }} />
+        ) : null
+      }
       ListEmptyComponent={
         <View style={styles.empty}>
           <Text style={styles.emptyText}>아직 프로젝트가 없습니다</Text>

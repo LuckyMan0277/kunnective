@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Star, Briefcase, Github, Linkedin, Globe, Mail, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserProfile, Project, Position } from '@/types'
+import type { UserProfile, Project, Position } from '@kunnective/shared'
 import ReviewModal from '@/components/modals/ReviewModal'
 
 interface Review {
@@ -107,9 +107,8 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            }`}
+            className={`w-4 h-4 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+              }`}
           />
         ))}
       </div>
@@ -313,11 +312,10 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
         <div className="mb-8 p-4 bg-secondary/50 rounded-lg">
           <div className="flex items-center justify-between">
             <span className="font-medium">프로젝트 참여 가능 여부</span>
-            <span className={`px-3 py-1 rounded-full ${
-              talent.available_for_projects
+            <span className={`px-3 py-1 rounded-full ${talent.available_for_projects
                 ? 'bg-green-100 text-green-800'
                 : 'bg-gray-100 text-gray-800'
-            }`}>
+              }`}>
               {talent.available_for_projects ? '✅ 가능' : '❌ 불가능'}
             </span>
           </div>
@@ -352,15 +350,14 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
                 >
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold">{project.title}</h3>
-                    <span className={`px-2 py-1 text-xs rounded ${
-                      project.status === 'recruiting'
+                    <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
                         ? 'bg-green-100 text-green-800'
                         : project.status === 'in_progress'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
                       {project.status === 'recruiting' ? '모집중' :
-                       project.status === 'in_progress' ? '진행중' : '완료'}
+                        project.status === 'in_progress' ? '진행중' : '완료'}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">

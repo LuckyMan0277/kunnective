@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bell, CheckCheck, Mail, UserPlus, MessageSquare, ThumbsUp } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { Notification } from '@/types'
+import type { Notification } from '@kunnective/shared'
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -137,21 +137,19 @@ export default function NotificationsPage() {
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'all'
+          className={`px-4 py-2 rounded-lg ${filter === 'all'
               ? 'bg-primary text-primary-foreground'
               : 'border border-border hover:bg-accent'
-          }`}
+            }`}
         >
           전체
         </button>
         <button
           onClick={() => setFilter('unread')}
-          className={`px-4 py-2 rounded-lg ${
-            filter === 'unread'
+          className={`px-4 py-2 rounded-lg ${filter === 'unread'
               ? 'bg-primary text-primary-foreground'
               : 'border border-border hover:bg-accent'
-          }`}
+            }`}
         >
           읽지 않음
         </button>
@@ -173,9 +171,8 @@ export default function NotificationsPage() {
             <div
               key={notification.id}
               onClick={() => handleNotificationClick(notification)}
-              className={`p-4 border border-border rounded-lg cursor-pointer transition hover:shadow-md ${
-                !notification.is_read ? 'bg-blue-50/50' : 'bg-card'
-              }`}
+              className={`p-4 border border-border rounded-lg cursor-pointer transition hover:shadow-md ${!notification.is_read ? 'bg-blue-50/50' : 'bg-card'
+                }`}
             >
               <div className="flex items-start gap-3">
                 <div className="mt-1">

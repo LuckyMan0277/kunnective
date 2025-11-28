@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { UserProfile } from '../types';
+import { UserProfile } from '@kunnective/shared';
 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -53,7 +54,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>로딩 중...</Text>
+        <ActivityIndicator size="large" color="#007AFF" />
       </View>
     );
   }
@@ -81,24 +82,11 @@ export default function ProfileScreen() {
 
           {profile.skills && profile.skills.length > 0 && (
             <View style={styles.row}>
-              <Text style={styles.label}>기술 스택</Text>
+              <Text style={styles.label}>관심 분야 / 스킬</Text>
               <View style={styles.tags}>
                 {profile.skills.map((skill, idx) => (
                   <View key={idx} style={styles.tag}>
                     <Text style={styles.tagText}>{skill}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {profile.interests && profile.interests.length > 0 && (
-            <View style={styles.row}>
-              <Text style={styles.label}>관심 분야</Text>
-              <View style={styles.tags}>
-                {profile.interests.map((interest, idx) => (
-                  <View key={idx} style={styles.tag}>
-                    <Text style={styles.tagText}>{interest}</Text>
                   </View>
                 ))}
               </View>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Filter, Star, Briefcase, MapPin } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { UserProfile } from '@/types'
+import type { UserProfile } from '@kunnective/shared'
 
 export default function TalentPage() {
   const [talents, setTalents] = useState<UserProfile[]>([])

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { Idea, IdeaComment } from '@/types'
+import type { Idea, IdeaComment } from '@kunnective/shared'
 
 export default function IdeaDetailPage({ params }: { params: { id: string } }) {
   const [idea, setIdea] = useState<Idea | null>(null)
@@ -221,9 +221,8 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
         <div className="flex items-center gap-4 pb-6 border-b border-border">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-              isLiked ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-accent'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${isLiked ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-accent'
+              }`}
           >
             <ThumbsUp className="w-4 h-4" />
             <span>{idea.likes_count}</span>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2, Users, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import type { Project, Position, ProjectComment, Application } from '@/types'
+import type { Project, Position, ProjectComment, Application } from '@kunnective/shared'
 
 export default function ProjectDetailPage({ params }: { params: { id: string } }) {
   const [project, setProject] = useState<Project | null>(null)
@@ -254,11 +254,10 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
-            <span className={`inline-block px-3 py-1 text-sm rounded ${
-              project.status === 'recruiting'
+            <span className={`inline-block px-3 py-1 text-sm rounded ${project.status === 'recruiting'
                 ? 'bg-green-100 text-green-800'
                 : 'bg-blue-100 text-blue-800'
-            }`}>
+              }`}>
               {project.status === 'recruiting' ? '모집중' : '진행중'}
             </span>
           </div>
@@ -358,9 +357,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         <div className="flex items-center gap-4 pb-6 border-b border-border">
           <button
             onClick={handleLike}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-              isLiked ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-accent'
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${isLiked ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-accent'
+              }`}
           >
             <ThumbsUp className="w-4 h-4" />
             <span>{project.likes_count}</span>

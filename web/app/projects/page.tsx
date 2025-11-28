@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Plus, ThumbsUp, MessageCircle, Users, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import type { Project } from '@/types'
+import type { Project } from '@kunnective/shared'
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -186,11 +186,10 @@ export default function ProjectsPage() {
 
             <motion.button
               onClick={() => setSortBy('latest')}
-              className={`px-4 py-2 rounded-lg ${
-                sortBy === 'latest'
+              className={`px-4 py-2 rounded-lg ${sortBy === 'latest'
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border hover:bg-accent'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -198,11 +197,10 @@ export default function ProjectsPage() {
             </motion.button>
             <motion.button
               onClick={() => setSortBy('popular')}
-              className={`px-4 py-2 rounded-lg ${
-                sortBy === 'popular'
+              className={`px-4 py-2 rounded-lg ${sortBy === 'popular'
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border hover:bg-accent'
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -229,67 +227,66 @@ export default function ProjectsPage() {
                   href={`/projects/${project.id}`}
                   className="block p-6 border border-border rounded-lg hover:shadow-lg transition"
                 >
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-semibold line-clamp-2 flex-1">
-                    {project.title}
-                  </h3>
-                  <span className={`px-2 py-1 text-xs rounded ${
-                    project.status === 'recruiting'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {project.status === 'recruiting' ? '모집중' : '진행중'}
-                  </span>
-                </div>
-
-                <p className="text-muted-foreground mb-4 line-clamp-3">
-                  {project.description}
-                </p>
-
-                {/* 모집 포지션 */}
-                {project.positions && project.positions.length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {project.positions.map((position: any) => (
-                      <span
-                        key={position.id}
-                        className="px-3 py-1 text-sm bg-secondary rounded-full"
-                      >
-                        {position.role} {position.filled_count}/{position.required_count}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* 기술 스택 */}
-                {project.tech_stack && project.tech_stack.length > 0 && (
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    {project.tech_stack.slice(0, 5).map((tech: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 text-xs border border-border rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">
-                      <ThumbsUp className="w-4 h-4" />
-                      {project.likes_count}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" />
-                      {project.comments_count}
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-xl font-semibold line-clamp-2 flex-1">
+                      {project.title}
+                    </h3>
+                    <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-blue-100 text-blue-800'
+                      }`}>
+                      {project.status === 'recruiting' ? '모집중' : '진행중'}
                     </span>
                   </div>
-                  <span>
-                    {project.owner?.username || '익명'}
-                  </span>
-                </div>
-              </Link>
+
+                  <p className="text-muted-foreground mb-4 line-clamp-3">
+                    {project.description}
+                  </p>
+
+                  {/* 모집 포지션 */}
+                  {project.positions && project.positions.length > 0 && (
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {project.positions.map((position: any) => (
+                        <span
+                          key={position.id}
+                          className="px-3 py-1 text-sm bg-secondary rounded-full"
+                        >
+                          {position.role} {position.filled_count}/{position.required_count}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 기술 스택 */}
+                  {project.tech_stack && project.tech_stack.length > 0 && (
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {project.tech_stack.slice(0, 5).map((tech: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-1 text-xs border border-border rounded"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4">
+                      <span className="flex items-center gap-1">
+                        <ThumbsUp className="w-4 h-4" />
+                        {project.likes_count}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageCircle className="w-4 h-4" />
+                        {project.comments_count}
+                      </span>
+                    </div>
+                    <span>
+                      {project.owner?.username || '익명'}
+                    </span>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </div>
