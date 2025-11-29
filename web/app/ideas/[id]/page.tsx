@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Idea, IdeaComment } from '@kunnective/shared'
 
-export default function IdeaDetailPage({ params }: { params: { id: string } }) {
+export default function IdeaDetailPage() {
+  const params = useParams()
+  const id = params?.id as string
   const [idea, setIdea] = useState<Idea | null>(null)
   const [comments, setComments] = useState<IdeaComment[]>([])
   const [newComment, setNewComment] = useState('')
@@ -18,10 +20,12 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
 
   useEffect(() => {
-    loadIdea()
-    loadComments()
-    checkAuth()
-  }, [params.id])
+    if (id) {
+      loadIdea()
+      loadComments()
+      checkAuth()
+    }
+  }, [id])
 
   async function checkAuth() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -35,7 +39,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
     const { data } = await supabase
       .from('idea_likes')
       .select('id')
-      .eq('idea_id', params.id)
+      .eq('idea_id', id)
       .eq('user_id', userId)
       .single()
 
@@ -44,14 +48,14 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
 
   async function loadIdea() {
     try {
-      console.log('Loading idea with ID:', params.id)
+      console.log('Loading idea with ID:', id)
       const { data, error } = await supabase
         .from('ideas')
         .select(`
           *,
           author:users!ideas_author_id_fkey(id, username, name, avatar_url)
         `)
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
       if (error) {
@@ -59,7 +63,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
         throw error
       }
       if (!data) {
-        console.error('No data returned for idea:', params.id)
+        console.error('No data returned for idea:', id)
       }
       setIdea(data)
     } catch (error) {
@@ -77,7 +81,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
           *,
           author:users!idea_comments_author_id_fkey(id, username, name, avatar_url)
         `)
-        .eq('idea_id', params.id)
+        .eq('idea_id', id)
         .is('parent_comment_id', null)
         .order('created_at', { ascending: false })
 
@@ -100,7 +104,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
         await supabase
           .from('idea_likes')
           .delete()
-          .eq('idea_id', params.id)
+          .eq('idea_id', id)
           .eq('user_id', currentUserId)
 
         setIdea(prev => prev ? { ...prev, likes_count: prev.likes_count - 1 } : null)
@@ -108,7 +112,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
       } else {
         await supabase
           .from('idea_likes')
-          .insert({ idea_id: params.id, user_id: currentUserId })
+          .insert({ idea_id: id, user_id: currentUserId })
 
         setIdea(prev => prev ? { ...prev, likes_count: prev.likes_count + 1 } : null)
         setIsLiked(true)
@@ -131,7 +135,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
       const { error } = await supabase
         .from('idea_comments')
         .insert({
-          idea_id: params.id,
+          idea_id: id,
           author_id: currentUserId,
           content: newComment.trim(),
         })
@@ -153,7 +157,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
       const { error } = await supabase
         .from('ideas')
         .delete()
-        .eq('id', params.id)
+        .eq('id', id)
 
       if (error) throw error
 
