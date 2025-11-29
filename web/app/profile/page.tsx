@@ -90,9 +90,6 @@ export default function ProfilePage() {
                 {profile.name || profile.username}
               </h1>
               <p className="text-muted-foreground">@{profile.username}</p>
-              {profile.status_message && (
-                <p className="text-sm text-foreground/80 mt-1">"{profile.status_message}"</p>
-              )}
               <div className="flex flex-wrap gap-2 mt-2">
                 {profile.major && (
                   <span className="px-3 py-1 bg-secondary rounded-full text-sm">
@@ -213,28 +210,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* 프로젝트 참여 가능 여부 */}
-        <div className="mb-8 p-4 bg-secondary/50 rounded-lg">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">프로젝트 참여 가능 여부</span>
-            <span className={`px-3 py-1 rounded-full ${profile.available_for_projects
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'
-              }`}>
-              {profile.available_for_projects ? '✅ 가능' : '❌ 불가능'}
-            </span>
-          </div>
-          {profile.contact_preference && (
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
-              <span className="font-medium text-sm text-muted-foreground">선호 연락 수단</span>
-              <span className="text-sm">
-                {profile.contact_preference === 'chat' && '앱 내 채팅'}
-                {profile.contact_preference === 'kakao' && '카카오톡'}
-                {profile.contact_preference === 'email' && '이메일'}
-              </span>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* 통계 */}

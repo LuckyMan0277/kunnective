@@ -26,7 +26,6 @@ export default function ProfileEditPage() {
   const [personality, setPersonality] = useState<string[]>([])
   const [isSeekingTeam, setIsSeekingTeam] = useState(false)
   const [doubleMajor, setDoubleMajor] = useState('')
-  const [statusMessage, setStatusMessage] = useState('')
   const [contactPreference, setContactPreference] = useState<'chat' | 'kakao' | 'email'>('chat')
   const [links, setLinks] = useState<{ type: string; url: string }[]>([])
 
@@ -67,7 +66,6 @@ export default function ProfileEditPage() {
       setAvatarUrl(data.avatar_url || '')
       setPersonality(data.personality || [])
       setDoubleMajor(data.double_major || '')
-      setStatusMessage(data.status_message || '')
       setContactPreference(data.contact_preference || 'chat')
       setLinks(data.links || [])
       setValues(data.values || [])
@@ -155,11 +153,8 @@ export default function ProfileEditPage() {
           portfolio_url: portfolioUrl.trim() || null,
           github_url: githubUrl.trim() || null,
           linkedin_url: linkedinUrl.trim() || null,
-          available_for_projects: availableForProjects,
-          avatar_url: avatarUrl || null,
           personality,
           double_major: doubleMajor || null,
-          status_message: statusMessage || null,
           contact_preference: contactPreference,
           links,
           values,
@@ -271,294 +266,270 @@ export default function ProfileEditPage() {
             />
           </div>
 
-          {/* Status Message */}
+        </div>
+
+        {/* Team Seeking Toggle */}
+        <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-secondary/10">
           <div>
-            <label className="block text-sm font-medium mb-2">상태 메시지</label>
+            <label className="font-medium block">팀 구하는 중 🔥</label>
+            <p className="text-sm text-muted-foreground">활성화하면 프로필에 강조 표시됩니다</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsSeekingTeam(!isSeekingTeam)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isSeekingTeam ? 'bg-primary' : 'bg-gray-200'
+              }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSeekingTeam ? 'translate-x-6' : 'translate-x-1'
+                }`}
+            />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4">
+          {/* Double Major */}
+          <div>
+            <label className="block text-sm font-medium mb-2">복수/부전공</label>
             <input
               type="text"
-              value={statusMessage}
-              onChange={(e) => setStatusMessage(e.target.value)}
-              placeholder="현재 상태를 알려주세요 (예: 팀 구하는 중 🔥)"
+              value={doubleMajor}
+              onChange={(e) => setDoubleMajor(e.target.value)}
+              placeholder="복수/부전공 입력"
               className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
+        </div>
 
-          {/* Team Seeking Toggle */}
-          <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-secondary/10">
-            <div>
-              <label className="font-medium block">팀 구하는 중 🔥</label>
-              <p className="text-sm text-muted-foreground">활성화하면 프로필에 강조 표시됩니다</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsSeekingTeam(!isSeekingTeam)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isSeekingTeam ? 'bg-primary' : 'bg-gray-200'
-                }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSeekingTeam ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-              />
-            </button>
+        {/* Contact Preference */}
+        <div>
+          <label className="block text-sm font-medium mb-2">선호 연락 수단</label>
+          <div className="flex gap-4">
+            {[
+              { value: 'chat', label: '앱 내 채팅' },
+              { value: 'kakao', label: '카카오톡' },
+              { value: 'email', label: '이메일' },
+            ].map((option) => (
+              <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="contactPreference"
+                  value={option.value}
+                  checked={contactPreference === option.value}
+                  onChange={(e) => setContactPreference(e.target.value as any)}
+                  className="w-4 h-4 text-primary"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {/* Double Major */}
-            <div>
-              <label className="block text-sm font-medium mb-2">복수/부전공</label>
-              <input
-                type="text"
-                value={doubleMajor}
-                onChange={(e) => setDoubleMajor(e.target.value)}
-                placeholder="복수/부전공 입력"
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-            </div>
-          </div>
-
-          {/* Contact Preference */}
-          <div>
-            <label className="block text-sm font-medium mb-2">선호 연락 수단</label>
-            <div className="flex gap-4">
-              {[
-                { value: 'chat', label: '앱 내 채팅' },
-                { value: 'kakao', label: '카카오톡' },
-                { value: 'email', label: '이메일' },
-              ].map((option) => (
-                <label key={option.value} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="contactPreference"
-                    value={option.value}
-                    checked={contactPreference === option.value}
-                    onChange={(e) => setContactPreference(e.target.value as any)}
-                    className="w-4 h-4 text-primary"
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Links */}
-          <div>
-            <label className="block text-sm font-medium mb-2">링크</label>
-            <div className="space-y-2 mb-2">
-              {links.map((link, index) => (
-                <div key={index} className="flex gap-2">
-                  <select
-                    value={link.type}
-                    onChange={(e) => {
-                      const newLinks = [...links]
-                      newLinks[index].type = e.target.value
-                      setLinks(newLinks)
-                    }}
-                    className="w-32 px-3 py-2 border border-border rounded-lg bg-background"
-                  >
-                    <option value="blog">블로그</option>
-                    <option value="behance">Behance</option>
-                    <option value="notion">Notion</option>
-                    <option value="other">기타</option>
-                  </select>
-                  <input
-                    type="url"
-                    value={link.url}
-                    onChange={(e) => {
-                      const newLinks = [...links]
-                      newLinks[index].url = e.target.value
-                      setLinks(newLinks)
-                    }}
-                    placeholder="https://..."
-                    className="flex-1 px-3 py-2 border border-border rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setLinks(links.filter((_, i) => i !== index))}
-                    className="p-2 text-destructive hover:bg-destructive/10 rounded-lg"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={() => setLinks([...links, { type: 'blog', url: '' }])}
-              className="text-sm text-primary hover:underline"
-            >
-              + 링크 추가
-            </button>
-          </div>
-
-          {/* Values (Selection) */}
-          <div>
-            <label className="block text-sm font-medium mb-2">가치관 (Values)</label>
-            <div className="flex flex-wrap gap-2">
-              {['성장', '재미', '돈', '인정', '안정', '효율', '소통', '도전'].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => {
-                    if (values.includes(value)) {
-                      setValues(values.filter(v => v !== value))
-                    } else {
-                      if (values.length >= 3) return alert('최대 3개까지 선택 가능합니다')
-                      setValues([...values, value])
-                    }
+        {/* Links */}
+        <div>
+          <label className="block text-sm font-medium mb-2">링크</label>
+          <div className="space-y-2 mb-2">
+            {links.map((link, index) => (
+              <div key={index} className="flex gap-2">
+                <select
+                  value={link.type}
+                  onChange={(e) => {
+                    const newLinks = [...links]
+                    newLinks[index].type = e.target.value
+                    setLinks(newLinks)
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${values.includes(value)
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                    }`}
+                  className="w-32 px-3 py-2 border border-border rounded-lg bg-background"
                 >
-                  {value}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
-          </div>
-
-          {/* Personality (Selection) */}
-          <div>
-            <label className="block text-sm font-medium mb-2">성격 (Personality)</label>
-            <div className="flex flex-wrap gap-2">
-              {['리더형', '팔로워형', '계획적', '즉흥적', '소통왕', '조용함', '열정적', '분석적'].map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => {
-                    if (personality.includes(item)) {
-                      setPersonality(personality.filter(p => p !== item))
-                    } else {
-                      if (personality.length >= 3) return alert('최대 3개까지 선택 가능합니다')
-                      setPersonality([...personality, item])
-                    }
+                  <option value="blog">블로그</option>
+                  <option value="behance">Behance</option>
+                  <option value="notion">Notion</option>
+                  <option value="other">기타</option>
+                </select>
+                <input
+                  type="url"
+                  value={link.url}
+                  onChange={(e) => {
+                    const newLinks = [...links]
+                    newLinks[index].url = e.target.value
+                    setLinks(newLinks)
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${personality.includes(item)
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                    }`}
+                  placeholder="https://..."
+                  className="flex-1 px-3 py-2 border border-border rounded-lg"
+                />
+                <button
+                  type="button"
+                  onClick={() => setLinks(links.filter((_, i) => i !== index))}
+                  className="p-2 text-destructive hover:bg-destructive/10 rounded-lg"
                 >
-                  {item}
+                  <X className="w-4 h-4" />
                 </button>
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
+              </div>
+            ))}
           </div>
+          <button
+            type="button"
+            onClick={() => setLinks([...links, { type: 'blog', url: '' }])}
+            className="text-sm text-primary hover:underline"
+          >
+            + 링크 추가
+          </button>
+        </div>
 
-          {/* Skills (Renamed to Tools/Keywords) */}
-          <div>
-            <label className="block text-sm font-medium mb-2">사용 도구 / 키워드</label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddSkill()
+        {/* Values (Selection) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">가치관 (Values)</label>
+          <div className="flex flex-wrap gap-2">
+            {['성장', '재미', '돈', '인정', '안정', '효율', '소통', '도전'].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  if (values.includes(value)) {
+                    setValues(values.filter(v => v !== value))
+                  } else {
+                    if (values.length >= 3) return alert('최대 3개까지 선택 가능합니다')
+                    setValues([...values, value])
                   }
                 }}
-                placeholder="도구, 기술, 관심 키워드 입력 (예: React, Figma, 영상편집)"
-                className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <button
-                type="button"
-                onClick={handleAddSkill}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90"
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${values.includes(value)
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
               >
-                추가
+                {value}
               </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2"
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
+        </div>
+
+        {/* Personality (Selection) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">성격 (Personality)</label>
+          <div className="flex flex-wrap gap-2">
+            {['리더형', '팔로워형', '계획적', '즉흥적', '소통왕', '조용함', '열정적', '분석적'].map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => {
+                  if (personality.includes(item)) {
+                    setPersonality(personality.filter(p => p !== item))
+                  } else {
+                    if (personality.length >= 3) return alert('최대 3개까지 선택 가능합니다')
+                    setPersonality([...personality, item])
+                  }
+                }}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${personality.includes(item)
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
+        </div>
+
+        {/* Skills (Renamed to Tools/Keywords) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">사용 도구 / 키워드</label>
+          <div className="flex gap-2 mb-2">
+            <input
+              type="text"
+              value={skillInput}
+              onChange={(e) => setSkillInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleAddSkill()
+                }
+              }}
+              placeholder="도구, 기술, 관심 키워드 입력 (예: React, Figma, 영상편집)"
+              className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+            <button
+              type="button"
+              onClick={handleAddSkill}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90"
+            >
+              추가
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="px-3 py-1 bg-secondary rounded-full flex items-center gap-2"
+              >
+                {skill}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSkill(skill)}
+                  className="hover:text-destructive"
                 >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="hover:text-destructive"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
           </div>
+        </div>
 
-          {/* Portfolio URL */}
-          <div>
-            <label className="block text-sm font-medium mb-2">포트폴리오 URL</label>
-            <input
-              type="url"
-              value={portfolioUrl}
-              onChange={(e) => setPortfolioUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        {/* Portfolio URL */}
+        <div>
+          <label className="block text-sm font-medium mb-2">포트폴리오 URL</label>
+          <input
+            type="url"
+            value={portfolioUrl}
+            onChange={(e) => setPortfolioUrl(e.target.value)}
+            placeholder="https://..."
+            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-          {/* GitHub URL */}
-          <div>
-            <label className="block text-sm font-medium mb-2">GitHub URL</label>
-            <input
-              type="url"
-              value={githubUrl}
-              onChange={(e) => setGithubUrl(e.target.value)}
-              placeholder="https://github.com/..."
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        {/* GitHub URL */}
+        <div>
+          <label className="block text-sm font-medium mb-2">GitHub URL</label>
+          <input
+            type="url"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/..."
+            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-          {/* LinkedIn URL */}
-          <div>
-            <label className="block text-sm font-medium mb-2">LinkedIn URL</label>
-            <input
-              type="url"
-              value={linkedinUrl}
-              onChange={(e) => setLinkedinUrl(e.target.value)}
-              placeholder="https://linkedin.com/in/..."
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        {/* LinkedIn URL */}
+        <div>
+          <label className="block text-sm font-medium mb-2">LinkedIn URL</label>
+          <input
+            type="url"
+            value={linkedinUrl}
+            onChange={(e) => setLinkedinUrl(e.target.value)}
+            placeholder="https://linkedin.com/in/..."
+            className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-          {/* Available for Projects */}
-          <div className="flex items-center gap-3 p-4 border border-border rounded-lg">
-            <input
-              type="checkbox"
-              id="available"
-              checked={availableForProjects}
-              onChange={(e) => setAvailableForProjects(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <label htmlFor="available" className="font-medium cursor-pointer">
-              프로젝트 참여 가능
-            </label>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-2 pt-4">
-            <button
-              onClick={() => router.back()}
-              disabled={saving}
-              className="flex-1 px-6 py-3 border border-border rounded-lg hover:bg-accent disabled:opacity-50"
-            >
-              취소
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
-            >
-              {saving ? '저장 중...' : '저장하기'}
-            </button>
-          </div>
+        {/* Actions */}
+        <div className="flex gap-2 pt-4">
+          <button
+            onClick={() => router.back()}
+            disabled={saving}
+            className="flex-1 px-6 py-3 border border-border rounded-lg hover:bg-accent disabled:opacity-50"
+          >
+            취소
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 disabled:opacity-50"
+          >
+            {saving ? '저장 중...' : '저장하기'}
+          </button>
         </div>
       </div>
     </div>
+
   )
 }
