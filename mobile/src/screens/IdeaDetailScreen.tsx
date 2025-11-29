@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, Alert, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { Idea, IdeaComment } from '@kunnective/shared';
-import { Avatar } from '../components/ui/Avatar';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
-import { styled } from 'nativewind';
-
-const StyledText = styled(Text);
-const StyledView = styled(View);
 
 export default function IdeaDetailScreen({ route }: any) {
     const { id } = route.params;
@@ -80,116 +72,290 @@ export default function IdeaDetailScreen({ route }: any) {
         setSubmitting(false);
     };
 
+    const renderAvatar = (url?: string | null, name?: string) => {
+        if (url) {
+            return <Image source={{ uri: url }} style={styles.avatarImage} />;
+        }
+        return (
+            <View style={styles.avatarFallback}>
+                <Text style={styles.avatarFallbackText}>
+                    {(name || '?').charAt(0).toUpperCase()}
+                </Text>
+            </View>
+        );
+    };
+
     if (loading) {
         return (
-            <StyledView className="flex-1 items-center justify-center">
+            <View style={styles.center}>
                 <ActivityIndicator size="large" color="#007AFF" />
-            </StyledView>
+            </View>
         );
     }
 
     if (!idea) {
         return (
-            <StyledView className="flex-1 items-center justify-center">
-                <StyledText>아이디어를 찾을 수 없습니다.</StyledText>
-            </StyledView>
+            <View style={styles.center}>
+                <Text>아이디어를 찾을 수 없습니다.</Text>
+            </View>
         );
     }
 
     return (
-        <ScrollView className="flex-1 bg-gray-50">
-            <StyledView className="p-4 gap-4">
-                <Card>
-                    <StyledView className="flex-row items-center mb-4">
-                        <Avatar
-                            src={idea.author?.avatar_url}
-                            fallback={idea.author?.name || '?'}
-                            size="sm"
-                            className="mr-2"
-                        />
-                        <StyledView>
-                            <StyledText className="font-semibold text-gray-900">
+        <ScrollView style={styles.container}>
+            <View style={styles.content}>
+                <View style={styles.card}>
+                    <View style={styles.headerRow}>
+                        {renderAvatar(idea.author?.avatar_url, idea.author?.name)}
+                        <View style={styles.headerText}>
+                            <Text style={styles.authorName}>
                                 {idea.author?.name}
-                            </StyledText>
-                            <StyledText className="text-xs text-gray-500">
+                            </Text>
+                            <Text style={styles.date}>
                                 {new Date(idea.created_at).toLocaleDateString()}
-                            </StyledText>
-                        </StyledView>
-                    </StyledView>
+                            </Text>
+                        </View>
+                    </View>
 
-                    <StyledText className="text-2xl font-bold mb-2">{idea.title}</StyledText>
-                    <StyledView className="flex-row gap-2 mb-4">
-                        <StyledView className="bg-blue-100 px-2 py-1 rounded">
-                            <StyledText className="text-blue-600 text-xs font-medium">
+                    <Text style={styles.title}>{idea.title}</Text>
+                    <View style={styles.tagRow}>
+                        <View style={styles.tag}>
+                            <Text style={styles.tagText}>
                                 {idea.status}
-                            </StyledText>
-                        </StyledView>
-                    </StyledView>
+                            </Text>
+                        </View>
+                    </View>
 
-                    <StyledText className="text-gray-700 leading-6 mb-6">
+                    <Text style={styles.description}>
                         {idea.description}
-                    </StyledText>
+                    </Text>
 
-                    <StyledView className="flex-row justify-between border-t border-gray-100 pt-4">
-                        <StyledText className="text-gray-500">
+                    <View style={styles.statsRow}>
+                        <Text style={styles.statsText}>
                             좋아요 {idea.likes_count}
-                        </StyledText>
-                        <StyledText className="text-gray-500">
+                        </Text>
+                        <Text style={styles.statsText}>
                             조회 {idea.view_count}
-                        </StyledText>
-                    </StyledView>
-                </Card>
+                        </Text>
+                    </View>
+                </View>
 
-                <StyledView>
-                    <StyledText className="text-lg font-bold mb-4 px-1">
+                <View>
+                    <Text style={styles.sectionTitle}>
                         댓글 {comments.length}
-                    </StyledText>
+                    </Text>
 
-                    <StyledView className="gap-3 mb-6">
+                    <View style={styles.commentList}>
                         {comments.map((comment) => (
-                            <Card key={comment.id} className="bg-white">
-                                <StyledView className="flex-row items-start">
-                                    <Avatar
-                                        src={comment.author?.avatar_url}
-                                        fallback={comment.author?.name || '?'}
-                                        size="sm"
-                                        className="mr-2 mt-1"
-                                    />
-                                    <StyledView className="flex-1">
-                                        <StyledView className="flex-row justify-between items-center mb-1">
-                                            <StyledText className="font-semibold text-sm">
+                            <View key={comment.id} style={styles.commentCard}>
+                                <View style={styles.commentHeader}>
+                                    {renderAvatar(comment.author?.avatar_url, comment.author?.name)}
+                                    <View style={styles.commentContent}>
+                                        <View style={styles.commentMeta}>
+                                            <Text style={styles.commentAuthor}>
                                                 {comment.author?.name}
-                                            </StyledText>
-                                            <StyledText className="text-xs text-gray-400">
+                                            </Text>
+                                            <Text style={styles.commentDate}>
                                                 {new Date(comment.created_at).toLocaleDateString()}
-                                            </StyledText>
-                                        </StyledView>
-                                        <StyledText className="text-gray-700">
+                                            </Text>
+                                        </View>
+                                        <Text style={styles.commentText}>
                                             {comment.content}
-                                        </StyledText>
-                                    </StyledView>
-                                </StyledView>
-                            </Card>
+                                        </Text>
+                                    </View>
+                                </View>
+                            </View>
                         ))}
-                    </StyledView>
+                    </View>
 
-                    <Card className="gap-2">
-                        <Input
+                    <View style={styles.inputCard}>
+                        <TextInput
+                            style={styles.input}
                             placeholder="댓글을 입력하세요..."
                             value={newComment}
                             onChangeText={setNewComment}
                             multiline
                         />
-                        <Button
-                            title="댓글 작성"
+                        <TouchableOpacity
+                            style={styles.submitButton}
                             onPress={handleAddComment}
-                            loading={submitting}
-                            size="sm"
-                            className="self-end"
-                        />
-                    </Card>
-                </StyledView>
-            </StyledView>
+                            disabled={submitting}
+                        >
+                            <Text style={styles.submitButtonText}>
+                                {submitting ? '작성 중...' : '댓글 작성'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f9fafb',
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    content: {
+        padding: 16,
+        gap: 16,
+    },
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+        marginBottom: 16,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    headerText: {
+        marginLeft: 8,
+    },
+    authorName: {
+        fontWeight: '600',
+        color: '#111827',
+    },
+    date: {
+        fontSize: 12,
+        color: '#6b7280',
+    },
+    avatarImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#e5e7eb',
+    },
+    avatarFallback: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: '#3b82f6',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    avatarFallbackText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        color: '#111827',
+    },
+    tagRow: {
+        flexDirection: 'row',
+        gap: 8,
+        marginBottom: 16,
+    },
+    tag: {
+        backgroundColor: '#dbeafe',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+    },
+    tagText: {
+        color: '#2563eb',
+        fontSize: 12,
+        fontWeight: '500',
+    },
+    description: {
+        color: '#374151',
+        lineHeight: 24,
+        marginBottom: 24,
+    },
+    statsRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderTopWidth: 1,
+        borderTopColor: '#f3f4f6',
+        paddingTop: 16,
+    },
+    statsText: {
+        color: '#6b7280',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        paddingHorizontal: 4,
+    },
+    commentList: {
+        gap: 12,
+        marginBottom: 24,
+    },
+    commentCard: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    commentHeader: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    commentContent: {
+        flex: 1,
+        marginLeft: 8,
+    },
+    commentMeta: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    commentAuthor: {
+        fontWeight: '600',
+        fontSize: 14,
+        color: '#111827',
+    },
+    commentDate: {
+        fontSize: 12,
+        color: '#9ca3af',
+    },
+    commentText: {
+        color: '#374151',
+    },
+    inputCard: {
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        padding: 16,
+        gap: 8,
+    },
+    input: {
+        minHeight: 80,
+        textAlignVertical: 'top',
+        padding: 0,
+    },
+    submitButton: {
+        alignSelf: 'flex-end',
+        backgroundColor: '#007AFF',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 8,
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+});
