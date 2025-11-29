@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2, Users, Send } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, Position, ProjectComment, Application } from '@kunnective/shared'
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailPage() {
+  const params = useParams()
+  const id = params?.id as string
   const [project, setProject] = useState<Project | null>(null)
   const [positions, setPositions] = useState<Position[]>([])
   const [comments, setComments] = useState<ProjectComment[]>([])
@@ -23,10 +25,12 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   const supabase = createClient()
 
   useEffect(() => {
-    loadProject()
-    loadComments()
-    checkAuth()
-  }, [params.id])
+    if (id) {
+      loadProject()
+      loadComments()
+      checkAuth()
+    }
+  }, [id])
 
   async function checkAuth() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -41,7 +45,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     const { data } = await supabase
       .from('project_likes')
       .select('id')
-      .eq('project_id', params.id)
+      .eq('project_id', id)
       .eq('user_id', userId)
       .single()
 
@@ -52,7 +56,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     const { data } = await supabase
       .from('applications')
       .select('*')
-      .eq('project_id', params.id)
+      .eq('project_id', id)
       .eq('user_id', userId)
 
     setApplications(data || [])
@@ -67,7 +71,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           owner:users!projects_owner_id_fkey(id, username, name, avatar_url),
           positions(*)
         `)
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
       if (error) throw error
@@ -88,7 +92,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           *,
           author:users!project_comments_author_id_fkey(id, username, name, avatar_url)
         `)
-        .eq('project_id', params.id)
+        .eq('project_id', id)
         .is('parent_comment_id', null)
         .order('created_at', { ascending: false })
 
@@ -111,7 +115,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
         await supabase
           .from('project_likes')
           .delete()
-          .eq('project_id', params.id)
+          .eq('project_id', id)
           .eq('user_id', currentUserId)
 
         setProject(prev => prev ? { ...prev, likes_count: prev.likes_count - 1 } : null)
@@ -119,7 +123,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       } else {
         await supabase
           .from('project_likes')
-          .insert({ project_id: params.id, user_id: currentUserId })
+          .insert({ project_id: id, user_id: currentUserId })
 
         setProject(prev => prev ? { ...prev, likes_count: prev.likes_count + 1 } : null)
         setIsLiked(true)
@@ -142,7 +146,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       const { error } = await supabase
         .from('project_comments')
         .insert({
-          project_id: params.id,
+          project_id: id,
           author_id: currentUserId,
           content: newComment.trim(),
         })
@@ -175,7 +179,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       const { error } = await supabase
         .from('applications')
         .insert({
-          project_id: params.id,
+          project_id: id,
           position_id: selectedPosition.id,
           user_id: currentUserId,
           message: applicationMessage.trim() || null,
@@ -205,7 +209,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
       const { error } = await supabase
         .from('projects')
         .delete()
-        .eq('id', params.id)
+        .eq('id', id)
 
       if (error) throw error
 
@@ -255,8 +259,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
             <span className={`inline-block px-3 py-1 text-sm rounded ${project.status === 'recruiting'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-blue-100 text-blue-800'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-blue-100 text-blue-800'
               }`}>
               {project.status === 'recruiting' ? '모집중' : '진행중'}
             </span>
