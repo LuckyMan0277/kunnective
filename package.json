@@ -4,12 +4,17 @@
   "description": "건국대 아이디어 공유 & 팀 빌딩 플랫폼",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build",
-    "start": "pnpm --filter web start",
-    "lint": "pnpm --filter web lint",
-    "dev:mobile": "pnpm --filter mobile start"
+    "dev": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=web",
+    "start": "npm run start --workspace=web",
+    "lint": "npm run lint --workspace=web",
+    "dev:mobile": "npm run start --workspace=mobile"
   },
+  "workspaces": [
+    "web",
+    "mobile",
+    "shared"
+  ],
   "keywords": [
     "nextjs",
     "react-native",
@@ -20,8 +25,6 @@
   "author": "Jaeyun",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@8.15.6"
+    "node": ">=18.0.0"
+  }
 }
