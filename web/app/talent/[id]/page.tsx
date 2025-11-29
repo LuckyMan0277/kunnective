@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { Star, Briefcase, Github, Linkedin, Globe, Mail, ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { UserProfile, Project, Position } from '@kunnective/shared'
@@ -17,7 +17,9 @@ interface Review {
   reviewer?: UserProfile
 }
 
-export default function TalentDetailPage({ params }: { params: { id: string } }) {
+export default function TalentDetailPage() {
+  const params = useParams()
+  const id = params?.id as string
   const [talent, setTalent] = useState<UserProfile | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
@@ -34,9 +36,11 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
   const supabase = createClient()
 
   useEffect(() => {
-    loadTalentProfile()
-    checkCurrentUser()
-  }, [params.id])
+    if (id) {
+      loadTalentProfile()
+      checkCurrentUser()
+    }
+  }, [id])
 
   useEffect(() => {
     if (selectedProject) {
@@ -67,7 +71,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
       const { data: talentData, error: talentError } = await supabase
         .from('users')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', id)
         .single()
 
       if (talentError) throw talentError
@@ -77,7 +81,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
       const { data: projectsData } = await supabase
         .from('projects')
         .select('*')
-        .eq('owner_id', params.id)
+        .eq('owner_id', id)
         .order('created_at', { ascending: false })
 
       setProjects(projectsData || [])
@@ -89,7 +93,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
           *,
           reviewer:users!reviews_reviewer_id_fkey(*)
         `)
-        .eq('reviewee_id', params.id)
+        .eq('reviewee_id', id)
         .order('created_at', { ascending: false })
         .limit(10)
 
@@ -144,7 +148,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
           project_id: selectedProject,
           position_id: selectedPosition,
           from_user_id: currentUserId,
-          to_user_id: params.id,
+          to_user_id: id,
           message: proposalMessage.trim() || null,
           status: 'pending',
         })
@@ -224,7 +228,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
               )}
             </div>
           </div>
-          {currentUserId && currentUserId !== params.id && (
+          {currentUserId && currentUserId !== id && (
             <div className="flex gap-2">
               {myProjects.length > 0 && (
                 <button
@@ -313,8 +317,8 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
           <div className="flex items-center justify-between">
             <span className="font-medium">프로젝트 참여 가능 여부</span>
             <span className={`px-3 py-1 rounded-full ${talent.available_for_projects
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
               }`}>
               {talent.available_for_projects ? '✅ 가능' : '❌ 불가능'}
             </span>
@@ -351,10 +355,10 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold">{project.title}</h3>
                     <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
-                        ? 'bg-green-100 text-green-800'
-                        : project.status === 'in_progress'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                      ? 'bg-green-100 text-green-800'
+                      : project.status === 'in_progress'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
                       }`}>
                       {project.status === 'recruiting' ? '모집중' :
                         project.status === 'in_progress' ? '진행중' : '완료'}
@@ -425,7 +429,7 @@ export default function TalentDetailPage({ params }: { params: { id: string } })
       <ReviewModal
         isOpen={showReviewModal}
         onClose={() => setShowReviewModal(false)}
-        revieweeId={params.id}
+        revieweeId={id}
         revieweeName={talent?.name || talent?.username || ''}
         onSuccess={loadTalentProfile}
       />
