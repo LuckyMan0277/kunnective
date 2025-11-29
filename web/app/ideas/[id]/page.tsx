@@ -44,6 +44,7 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
 
   async function loadIdea() {
     try {
+      console.log('Loading idea with ID:', params.id)
       const { data, error } = await supabase
         .from('ideas')
         .select(`
@@ -53,7 +54,13 @@ export default function IdeaDetailPage({ params }: { params: { id: string } }) {
         .eq('id', params.id)
         .single()
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error loading idea:', error)
+        throw error
+      }
+      if (!data) {
+        console.error('No data returned for idea:', params.id)
+      }
       setIdea(data)
     } catch (error) {
       console.error('Error loading idea:', error)
