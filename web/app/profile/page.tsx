@@ -121,18 +121,28 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* 자기소개 */}
-        {profile.bio && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-3">📝 소개</h2>
-            <p className="whitespace-pre-wrap">{profile.bio}</p>
-          </div>
-        )}
+        {/* 자기소개 & 가치관 */}
+        <div className="mb-8">
+          {profile.bio && (
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold mb-3">📝 소개</h2>
+              <p className="whitespace-pre-wrap">{profile.bio}</p>
+            </div>
+          )}
+          {profile.values && (
+            <div>
+              <h2 className="text-xl font-semibold mb-3">💎 가치관</h2>
+              <p className="whitespace-pre-wrap text-foreground/90 bg-secondary/30 p-4 rounded-lg">
+                {profile.values}
+              </p>
+            </div>
+          )}
+        </div>
 
-        {/* 스킬 */}
+        {/* 사용 도구 / 키워드 */}
         {profile.skills && profile.skills.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-3">💼 스킬</h2>
+            <h2 className="text-xl font-semibold mb-3">🛠 사용 도구 / 키워드</h2>
             <div className="flex flex-wrap gap-2">
               {profile.skills.map((skill, idx) => (
                 <span key={idx} className="px-3 py-1 bg-secondary rounded-full">

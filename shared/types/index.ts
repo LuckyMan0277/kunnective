@@ -40,6 +40,7 @@ export interface UserProfile {
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
+    values?: string
     available_for_projects: boolean
     project_count: number
     rating: number
@@ -65,6 +66,7 @@ export interface InsertUserProfile {
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
+    values?: string
     available_for_projects?: boolean
 }
 
@@ -84,6 +86,7 @@ export interface UpdateUserProfile {
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
+    values?: string
     available_for_projects?: boolean
 }
 

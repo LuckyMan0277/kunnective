@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 export default function NewIdeaPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('IT/Programming')
+  const [keywords, setKeywords] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -31,6 +33,8 @@ export default function NewIdeaPage() {
           author_id: user.id,
           title: title.trim(),
           description: description.trim(),
+          category,
+          tags: keywords.split(',').map(k => k.trim()).filter(k => k),
           status: 'active',
         })
 

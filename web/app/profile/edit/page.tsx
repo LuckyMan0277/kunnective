@@ -27,6 +27,7 @@ export default function ProfileEditPage() {
   const [statusMessage, setStatusMessage] = useState('')
   const [contactPreference, setContactPreference] = useState<'chat' | 'kakao' | 'email'>('chat')
   const [links, setLinks] = useState<{ type: string; url: string }[]>([])
+  const [values, setValues] = useState('')
 
   const router = useRouter()
   const supabase = createClient()
@@ -68,6 +69,7 @@ export default function ProfileEditPage() {
       setStatusMessage(data.status_message || '')
       setContactPreference(data.contact_preference || 'chat')
       setLinks(data.links || [])
+      setValues(data.values || '')
     } catch (error) {
       console.error('Error loading profile:', error)
     } finally {
@@ -158,6 +160,7 @@ export default function ProfileEditPage() {
           status_message: statusMessage || null,
           contact_preference: contactPreference,
           links,
+          values: values.trim() || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -380,9 +383,21 @@ export default function ProfileEditPage() {
             </button>
           </div>
 
-          {/* Skills */}
+          {/* Values */}
           <div>
-            <label className="block text-sm font-medium mb-2">스킬</label>
+            <label className="block text-sm font-medium mb-2">가치관 (Values)</label>
+            <textarea
+              value={values}
+              onChange={(e) => setValues(e.target.value)}
+              placeholder="어떤 가치를 중요하게 생각하시나요? (예: 성장, 재미, 임팩트, 워라밸)"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+              rows={2}
+            />
+          </div>
+
+          {/* Skills (Renamed to Tools/Keywords) */}
+          <div>
+            <label className="block text-sm font-medium mb-2">사용 도구 / 키워드</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -394,7 +409,7 @@ export default function ProfileEditPage() {
                     handleAddSkill()
                   }
                 }}
-                placeholder="스킬을 입력하세요"
+                placeholder="도구, 기술, 관심 키워드 입력 (예: React, Figma, 영상편집)"
                 className="flex-1 px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               />
               <button
