@@ -5,6 +5,8 @@ import { Idea, IdeaComment } from '@kunnective/shared';
 
 export default function IdeaDetailScreen({ route }: any) {
     const { id } = route.params;
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     const [idea, setIdea] = useState<Idea | null>(null);
     const [comments, setComments] = useState<IdeaComment[]>([]);
     const [newComment, setNewComment] = useState('');
@@ -26,6 +28,10 @@ export default function IdeaDetailScreen({ route }: any) {
             .eq('id', id)
             .single();
 
+        if (error) {
+            console.error('Error loading idea:', error);
+            setErrorMsg(error.message);
+        }
         if (data) setIdea(data);
         setLoading(false);
     };
@@ -89,6 +95,15 @@ export default function IdeaDetailScreen({ route }: any) {
         return (
             <View style={styles.center}>
                 <ActivityIndicator size="large" color="#007AFF" />
+            </View>
+        );
+    }
+
+    if (errorMsg) {
+        return (
+            <View style={styles.center}>
+                <Text style={{ color: 'red', marginBottom: 10 }}>오류가 발생했습니다</Text>
+                <Text>{errorMsg}</Text>
             </View>
         );
     }
