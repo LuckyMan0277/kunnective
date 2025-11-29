@@ -22,12 +22,13 @@ export default function ProfileEditPage() {
   const [linkedinUrl, setLinkedinUrl] = useState('')
   const [availableForProjects, setAvailableForProjects] = useState(true)
   const [avatarUrl, setAvatarUrl] = useState('')
-  const [mbti, setMbti] = useState('')
+  const [values, setValues] = useState<string[]>([])
+  const [personality, setPersonality] = useState<string[]>([])
+  const [isSeekingTeam, setIsSeekingTeam] = useState(false)
   const [doubleMajor, setDoubleMajor] = useState('')
   const [statusMessage, setStatusMessage] = useState('')
   const [contactPreference, setContactPreference] = useState<'chat' | 'kakao' | 'email'>('chat')
   const [links, setLinks] = useState<{ type: string; url: string }[]>([])
-  const [values, setValues] = useState('')
 
   const router = useRouter()
   const supabase = createClient()
@@ -64,12 +65,13 @@ export default function ProfileEditPage() {
       setLinkedinUrl(data.linkedin_url || '')
       setAvailableForProjects(data.available_for_projects)
       setAvatarUrl(data.avatar_url || '')
-      setMbti(data.mbti || '')
+      setPersonality(data.personality || [])
       setDoubleMajor(data.double_major || '')
       setStatusMessage(data.status_message || '')
       setContactPreference(data.contact_preference || 'chat')
       setLinks(data.links || [])
-      setValues(data.values || '')
+      setValues(data.values || [])
+      setIsSeekingTeam(data.is_seeking_team || false)
     } catch (error) {
       console.error('Error loading profile:', error)
     } finally {
@@ -155,12 +157,13 @@ export default function ProfileEditPage() {
           linkedin_url: linkedinUrl.trim() || null,
           available_for_projects: availableForProjects,
           avatar_url: avatarUrl || null,
-          mbti: mbti || null,
+          personality,
           double_major: doubleMajor || null,
           status_message: statusMessage || null,
           contact_preference: contactPreference,
           links,
-          values: values.trim() || null,
+          values,
+          is_seeking_team: isSeekingTeam,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -280,22 +283,26 @@ export default function ProfileEditPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            {/* MBTI */}
+          {/* Team Seeking Toggle */}
+          <div className="flex items-center justify-between p-4 border border-border rounded-lg bg-secondary/10">
             <div>
-              <label className="block text-sm font-medium mb-2">MBTI</label>
-              <select
-                value={mbti}
-                onChange={(e) => setMbti(e.target.value)}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background"
-              >
-                <option value="">선택안함</option>
-                {['ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP', 'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'].map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
+              <label className="font-medium block">팀 구하는 중 🔥</label>
+              <p className="text-sm text-muted-foreground">활성화하면 프로필에 강조 표시됩니다</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsSeekingTeam(!isSeekingTeam)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isSeekingTeam ? 'bg-primary' : 'bg-gray-200'
+                }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isSeekingTeam ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+              />
+            </button>
+          </div>
 
+          <div className="grid grid-cols-1 gap-4">
             {/* Double Major */}
             <div>
               <label className="block text-sm font-medium mb-2">복수/부전공</label>
@@ -383,16 +390,60 @@ export default function ProfileEditPage() {
             </button>
           </div>
 
-          {/* Values */}
+          {/* Values (Selection) */}
           <div>
             <label className="block text-sm font-medium mb-2">가치관 (Values)</label>
-            <textarea
-              value={values}
-              onChange={(e) => setValues(e.target.value)}
-              placeholder="어떤 가치를 중요하게 생각하시나요? (예: 성장, 재미, 임팩트, 워라밸)"
-              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
-              rows={2}
-            />
+            <div className="flex flex-wrap gap-2">
+              {['성장', '재미', '돈', '인정', '안정', '효율', '소통', '도전'].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => {
+                    if (values.includes(value)) {
+                      setValues(values.filter(v => v !== value))
+                    } else {
+                      if (values.length >= 3) return alert('최대 3개까지 선택 가능합니다')
+                      setValues([...values, value])
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${values.includes(value)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    }`}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
+          </div>
+
+          {/* Personality (Selection) */}
+          <div>
+            <label className="block text-sm font-medium mb-2">성격 (Personality)</label>
+            <div className="flex flex-wrap gap-2">
+              {['리더형', '팔로워형', '계획적', '즉흥적', '소통왕', '조용함', '열정적', '분석적'].map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => {
+                    if (personality.includes(item)) {
+                      setPersonality(personality.filter(p => p !== item))
+                    } else {
+                      if (personality.length >= 3) return alert('최대 3개까지 선택 가능합니다')
+                      setPersonality([...personality, item])
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${personality.includes(item)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">최대 3개 선택 가능</p>
           </div>
 
           {/* Skills (Renamed to Tools/Keywords) */}

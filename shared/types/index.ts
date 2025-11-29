@@ -35,12 +35,13 @@ export interface UserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
-    mbti?: string
+    personality?: string[]
     double_major?: string
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
-    values?: string
+    values?: string[]
+    is_seeking_team: boolean
     available_for_projects: boolean
     project_count: number
     rating: number
@@ -61,12 +62,13 @@ export interface InsertUserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
-    mbti?: string
+    personality?: string[]
     double_major?: string
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
-    values?: string
+    values?: string[]
+    is_seeking_team?: boolean
     available_for_projects?: boolean
 }
 
@@ -81,12 +83,13 @@ export interface UpdateUserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
-    mbti?: string
+    personality?: string[]
     double_major?: string
     status_message?: string
     contact_preference?: 'chat' | 'kakao' | 'email'
     links?: { type: string; url: string }[]
-    values?: string
+    values?: string[]
+    is_seeking_team?: boolean
     available_for_projects?: boolean
 }
 

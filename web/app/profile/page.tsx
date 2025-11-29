@@ -104,9 +104,9 @@ export default function ProfilePage() {
                     복수: {profile.double_major}
                   </span>
                 )}
-                {profile.mbti && (
-                  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
-                    {profile.mbti}
+                {profile.is_seeking_team && (
+                  <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm font-medium animate-pulse">
+                    🔥 팀 구하는 중
                   </span>
                 )}
               </div>
@@ -129,12 +129,28 @@ export default function ProfilePage() {
               <p className="whitespace-pre-wrap">{profile.bio}</p>
             </div>
           )}
-          {profile.values && (
-            <div>
+          {profile.values && profile.values.length > 0 && (
+            <div className="mb-4">
               <h2 className="text-xl font-semibold mb-3">💎 가치관</h2>
-              <p className="whitespace-pre-wrap text-foreground/90 bg-secondary/30 p-4 rounded-lg">
-                {profile.values}
-              </p>
+              <div className="flex flex-wrap gap-2">
+                {profile.values.map((value, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                    {value}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {profile.personality && profile.personality.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold mb-3">🧠 성격</h2>
+              <div className="flex flex-wrap gap-2">
+                {profile.personality.map((item, idx) => (
+                  <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full font-medium">
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>

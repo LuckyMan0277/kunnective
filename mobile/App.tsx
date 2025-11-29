@@ -20,6 +20,7 @@ import ChatListScreen from './src/screens/ChatListScreen';
 import CreateIdeaScreen from './src/screens/CreateIdeaScreen';
 import IdeaDetailScreen from './src/screens/IdeaDetailScreen';
 import ChatRoomScreen from './src/screens/ChatRoomScreen';
+import ProfileEditScreen from './src/screens/ProfileEditScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,6 +103,11 @@ export default function App() {
               name="ChatRoom"
               component={ChatRoomScreen}
               options={({ route }: any) => ({ title: route.params.otherUser?.name || '채팅' })}
+            />
+            <Stack.Screen
+              name="ProfileEdit"
+              component={ProfileEditScreen}
+              options={{ title: '프로필 수정' }}
             />
           </>
         ) : (

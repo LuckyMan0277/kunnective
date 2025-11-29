@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { UserProfile } from '@kunnective/shared';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -69,6 +71,17 @@ export default function ProfileScreen() {
         </View>
         <Text style={styles.name}>{profile?.name || '이름 없음'}</Text>
         <Text style={styles.email}>{profile?.email}</Text>
+        {profile?.is_seeking_team && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>🔥 팀 구하는 중</Text>
+          </View>
+        )}
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate('ProfileEdit' as any)}
+        >
+          <Text style={styles.editButtonText}>프로필 수정</Text>
+        </TouchableOpacity>
       </View>
 
       {profile && (
@@ -79,6 +92,32 @@ export default function ProfileScreen() {
             value={profile.year ? `${profile.year}학년` : '미설정'}
           />
           <InfoRow label="자기소개" value={profile.bio || '미설정'} />
+
+          {profile.values && profile.values.length > 0 && (
+            <View style={styles.row}>
+              <Text style={styles.label}>가치관</Text>
+              <View style={styles.tags}>
+                {profile.values.map((value, idx) => (
+                  <View key={idx} style={[styles.tag, { backgroundColor: '#e3f2fd' }]}>
+                    <Text style={[styles.tagText, { color: '#1976d2' }]}>{value}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {profile.personality && profile.personality.length > 0 && (
+            <View style={styles.row}>
+              <Text style={styles.label}>성격</Text>
+              <View style={styles.tags}>
+                {profile.personality.map((item, idx) => (
+                  <View key={idx} style={[styles.tag, { backgroundColor: '#f3e5f5' }]}>
+                    <Text style={[styles.tagText, { color: '#7b1fa2' }]}>{item}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {profile.skills && profile.skills.length > 0 && (
             <View style={styles.row}>
@@ -197,6 +236,31 @@ const styles = StyleSheet.create({
   logoutText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  badge: {
+    marginTop: 8,
+    backgroundColor: '#fff3e0',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: '#e65100',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  editButton: {
+    marginTop: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#007AFF',
+  },
+  editButtonText: {
+    color: '#007AFF',
+    fontSize: 14,
     fontWeight: '600',
   },
 });
