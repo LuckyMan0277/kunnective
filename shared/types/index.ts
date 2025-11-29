@@ -35,6 +35,11 @@ export interface UserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
+    mbti?: string
+    double_major?: string
+    status_message?: string
+    contact_preference?: 'chat' | 'kakao' | 'email'
+    links?: { type: string; url: string }[]
     available_for_projects: boolean
     project_count: number
     rating: number
@@ -55,6 +60,11 @@ export interface InsertUserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
+    mbti?: string
+    double_major?: string
+    status_message?: string
+    contact_preference?: 'chat' | 'kakao' | 'email'
+    links?: { type: string; url: string }[]
     available_for_projects?: boolean
 }
 
@@ -69,6 +79,11 @@ export interface UpdateUserProfile {
     github_url?: string
     linkedin_url?: string
     avatar_url?: string
+    mbti?: string
+    double_major?: string
+    status_message?: string
+    contact_preference?: 'chat' | 'kakao' | 'email'
+    links?: { type: string; url: string }[]
     available_for_projects?: boolean
 }
 

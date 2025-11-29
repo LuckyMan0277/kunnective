@@ -22,6 +22,11 @@ export default function ProfileEditPage() {
   const [linkedinUrl, setLinkedinUrl] = useState('')
   const [availableForProjects, setAvailableForProjects] = useState(true)
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [mbti, setMbti] = useState('')
+  const [doubleMajor, setDoubleMajor] = useState('')
+  const [statusMessage, setStatusMessage] = useState('')
+  const [contactPreference, setContactPreference] = useState<'chat' | 'kakao' | 'email'>('chat')
+  const [links, setLinks] = useState<{ type: string; url: string }[]>([])
 
   const router = useRouter()
   const supabase = createClient()
@@ -58,6 +63,11 @@ export default function ProfileEditPage() {
       setLinkedinUrl(data.linkedin_url || '')
       setAvailableForProjects(data.available_for_projects)
       setAvatarUrl(data.avatar_url || '')
+      setMbti(data.mbti || '')
+      setDoubleMajor(data.double_major || '')
+      setStatusMessage(data.status_message || '')
+      setContactPreference(data.contact_preference || 'chat')
+      setLinks(data.links || [])
     } catch (error) {
       console.error('Error loading profile:', error)
     } finally {
@@ -143,6 +153,11 @@ export default function ProfileEditPage() {
           linkedin_url: linkedinUrl.trim() || null,
           available_for_projects: availableForProjects,
           avatar_url: avatarUrl || null,
+          mbti: mbti || null,
+          double_major: doubleMajor || null,
+          status_message: statusMessage || null,
+          contact_preference: contactPreference,
+          links,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id)
@@ -248,6 +263,121 @@ export default function ProfileEditPage() {
               className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
               rows={4}
             />
+          </div>
+
+          {/* Status Message */}
+          <div>
+            <label className="block text-sm font-medium mb-2">상태 메시지</label>
+            <input
+              type="text"
+              value={statusMessage}
+              onChange={(e) => setStatusMessage(e.target.value)}
+              placeholder="현재 상태를 알려주세요 (예: 팀 구하는 중 🔥)"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* MBTI */}
+            <div>
+              <label className="block text-sm font-medium mb-2">MBTI</label>
+              <select
+                value={mbti}
+                onChange={(e) => setMbti(e.target.value)}
+                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background"
+              >
+                <option value="">선택안함</option>
+                {['ISTJ', 'ISFJ', 'INFJ', 'INTJ', 'ISTP', 'ISFP', 'INFP', 'INTP', 'ESTP', 'ESFP', 'ENFP', 'ENTP', 'ESTJ', 'ESFJ', 'ENFJ', 'ENTJ'].map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Double Major */}
+            <div>
+              <label className="block text-sm font-medium mb-2">복수/부전공</label>
+              <input
+                type="text"
+                value={doubleMajor}
+                onChange={(e) => setDoubleMajor(e.target.value)}
+                placeholder="복수/부전공 입력"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </div>
+          </div>
+
+          {/* Contact Preference */}
+          <div>
+            <label className="block text-sm font-medium mb-2">선호 연락 수단</label>
+            <div className="flex gap-4">
+              {[
+                { value: 'chat', label: '앱 내 채팅' },
+                { value: 'kakao', label: '카카오톡' },
+                { value: 'email', label: '이메일' },
+              ].map((option) => (
+                <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="contactPreference"
+                    value={option.value}
+                    checked={contactPreference === option.value}
+                    onChange={(e) => setContactPreference(e.target.value as any)}
+                    className="w-4 h-4 text-primary"
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Links */}
+          <div>
+            <label className="block text-sm font-medium mb-2">링크</label>
+            <div className="space-y-2 mb-2">
+              {links.map((link, index) => (
+                <div key={index} className="flex gap-2">
+                  <select
+                    value={link.type}
+                    onChange={(e) => {
+                      const newLinks = [...links]
+                      newLinks[index].type = e.target.value
+                      setLinks(newLinks)
+                    }}
+                    className="w-32 px-3 py-2 border border-border rounded-lg bg-background"
+                  >
+                    <option value="blog">블로그</option>
+                    <option value="behance">Behance</option>
+                    <option value="notion">Notion</option>
+                    <option value="other">기타</option>
+                  </select>
+                  <input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => {
+                      const newLinks = [...links]
+                      newLinks[index].url = e.target.value
+                      setLinks(newLinks)
+                    }}
+                    placeholder="https://..."
+                    className="flex-1 px-3 py-2 border border-border rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setLinks(links.filter((_, i) => i !== index))}
+                    className="p-2 text-destructive hover:bg-destructive/10 rounded-lg"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setLinks([...links, { type: 'blog', url: '' }])}
+              className="text-sm text-primary hover:underline"
+            >
+              + 링크 추가
+            </button>
           </div>
 
           {/* Skills */}

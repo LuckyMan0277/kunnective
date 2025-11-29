@@ -90,11 +90,26 @@ export default function ProfilePage() {
                 {profile.name || profile.username}
               </h1>
               <p className="text-muted-foreground">@{profile.username}</p>
-              {profile.major && (
-                <span className="inline-block mt-2 px-3 py-1 bg-secondary rounded-full text-sm">
-                  {profile.major} {profile.year && `· ${profile.year}`}
-                </span>
+              {profile.status_message && (
+                <p className="text-sm text-foreground/80 mt-1">"{profile.status_message}"</p>
               )}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {profile.major && (
+                  <span className="px-3 py-1 bg-secondary rounded-full text-sm">
+                    {profile.major} {profile.year && `· ${profile.year}`}
+                  </span>
+                )}
+                {profile.double_major && (
+                  <span className="px-3 py-1 bg-secondary rounded-full text-sm">
+                    복수: {profile.double_major}
+                  </span>
+                )}
+                {profile.mbti && (
+                  <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                    {profile.mbti}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -132,38 +147,42 @@ export default function ProfilePage() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-3">🔗 링크</h2>
           <div className="space-y-2">
-            {profile.portfolio_url && (
-              <a
-                href={profile.portfolio_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-primary hover:underline"
-              >
-                <Globe className="w-4 h-4" />
-                Portfolio: {profile.portfolio_url}
-              </a>
-            )}
-            {profile.github_url && (
-              <a
-                href={profile.github_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-primary hover:underline"
-              >
-                <Github className="w-4 h-4" />
-                GitHub: {profile.github_url}
-              </a>
-            )}
-            {profile.linkedin_url && (
-              <a
-                href={profile.linkedin_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-primary hover:underline"
-              >
-                <Linkedin className="w-4 h-4" />
-                LinkedIn: {profile.linkedin_url}
-              </a>
+            {profile.links && profile.links.length > 0 ? (
+              profile.links.map((link, idx) => (
+                <a
+                  key={idx}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-primary hover:underline"
+                >
+                  <Globe className="w-4 h-4" />
+                  {link.type === 'blog' && 'Blog'}
+                  {link.type === 'behance' && 'Behance'}
+                  {link.type === 'notion' && 'Notion'}
+                  {link.type === 'other' && 'Link'}
+                  : {link.url}
+                </a>
+              ))
+            ) : (
+              // Fallback for legacy fields
+              <>
+                {profile.portfolio_url && (
+                  <a href={profile.portfolio_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                    <Globe className="w-4 h-4" /> Portfolio: {profile.portfolio_url}
+                  </a>
+                )}
+                {profile.github_url && (
+                  <a href={profile.github_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                    <Github className="w-4 h-4" /> GitHub: {profile.github_url}
+                  </a>
+                )}
+                {profile.linkedin_url && (
+                  <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-primary hover:underline">
+                    <Linkedin className="w-4 h-4" /> LinkedIn: {profile.linkedin_url}
+                  </a>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -173,61 +192,71 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <span className="font-medium">프로젝트 참여 가능 여부</span>
             <span className={`px-3 py-1 rounded-full ${profile.available_for_projects
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-800'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-gray-100 text-gray-800'
               }`}>
               {profile.available_for_projects ? '✅ 가능' : '❌ 불가능'}
             </span>
           </div>
-        </div>
-
-        {/* 통계 */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="p-4 bg-secondary/50 rounded-lg text-center">
-            <p className="text-2xl font-bold">{profile.project_count}</p>
-            <p className="text-sm text-muted-foreground">참여한 프로젝트</p>
-          </div>
-          <div className="p-4 bg-secondary/50 rounded-lg text-center">
-            <p className="text-2xl font-bold">{profile.rating.toFixed(1)}</p>
-            <p className="text-sm text-muted-foreground">평균 평점</p>
-          </div>
-        </div>
-
-        {/* 내가 올린 프로젝트 */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">내가 올린 프로젝트</h2>
-          {projects.length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">
-              아직 올린 프로젝트가 없습니다
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {projects.map((project) => (
-                <div
-                  key={project.id}
-                  onClick={() => router.push(`/projects/${project.id}`)}
-                  className="p-4 border border-border rounded-lg hover:shadow-lg cursor-pointer transition"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold">{project.title}</h3>
-                    <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-blue-100 text-blue-800'
-                      }`}>
-                      {project.status === 'recruiting' ? '모집중' : '진행중'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {project.description}
-                  </p>
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    {new Date(project.created_at).toLocaleDateString('ko-KR')}
-                  </div>
-                </div>
-              ))}
+          {profile.contact_preference && (
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
+              <span className="font-medium text-sm text-muted-foreground">선호 연락 수단</span>
+              <span className="text-sm">
+                {profile.contact_preference === 'chat' && '앱 내 채팅'}
+                {profile.contact_preference === 'kakao' && '카카오톡'}
+                {profile.contact_preference === 'email' && '이메일'}
+              </span>
             </div>
           )}
         </div>
+      </div>
+
+      {/* 통계 */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="p-4 bg-secondary/50 rounded-lg text-center">
+          <p className="text-2xl font-bold">{profile.project_count}</p>
+          <p className="text-sm text-muted-foreground">참여한 프로젝트</p>
+        </div>
+        <div className="p-4 bg-secondary/50 rounded-lg text-center">
+          <p className="text-2xl font-bold">{profile.rating.toFixed(1)}</p>
+          <p className="text-sm text-muted-foreground">평균 평점</p>
+        </div>
+      </div>
+
+      {/* 내가 올린 프로젝트 */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">내가 올린 프로젝트</h2>
+        {projects.length === 0 ? (
+          <p className="text-center py-8 text-muted-foreground">
+            아직 올린 프로젝트가 없습니다
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {projects.map((project) => (
+              <div
+                key={project.id}
+                onClick={() => router.push(`/projects/${project.id}`)}
+                className="p-4 border border-border rounded-lg hover:shadow-lg cursor-pointer transition"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-semibold">{project.title}</h3>
+                  <span className={`px-2 py-1 text-xs rounded ${project.status === 'recruiting'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-blue-100 text-blue-800'
+                    }`}>
+                    {project.status === 'recruiting' ? '모집중' : '진행중'}
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {project.description}
+                </p>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {new Date(project.created_at).toLocaleDateString('ko-KR')}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
