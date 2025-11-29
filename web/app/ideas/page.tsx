@@ -148,8 +148,8 @@ export default function IdeasPage() {
             <motion.button
               onClick={() => setSortBy('latest')}
               className={`px-4 py-2 rounded-lg ${sortBy === 'latest'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'border border-border hover:bg-accent'
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-border hover:bg-accent'
                 }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -159,8 +159,8 @@ export default function IdeasPage() {
             <motion.button
               onClick={() => setSortBy('popular')}
               className={`px-4 py-2 rounded-lg ${sortBy === 'popular'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'border border-border hover:bg-accent'
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-border hover:bg-accent'
                 }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -170,8 +170,8 @@ export default function IdeasPage() {
             <motion.button
               onClick={() => setSortBy('views')}
               className={`px-4 py-2 rounded-lg ${sortBy === 'views'
-                  ? 'bg-primary text-primary-foreground'
-                  : 'border border-border hover:bg-accent'
+                ? 'bg-primary text-primary-foreground'
+                : 'border border-border hover:bg-accent'
                 }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -194,18 +194,19 @@ export default function IdeasPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
+                className="h-full"
               >
                 <Link
                   href={`/ideas/${idea.id}`}
-                  className="block p-6 border border-border rounded-lg hover:shadow-lg transition"
+                  className="flex flex-col h-full p-6 border border-border rounded-lg hover:shadow-lg transition"
                 >
                   <h3 className="text-xl font-semibold mb-3 line-clamp-2">
                     {idea.title}
                   </h3>
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
+                  <p className="text-muted-foreground mb-4 line-clamp-3 flex-1">
                     {idea.description}
                   </p>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground mt-auto">
                     <div className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
                         <ThumbsUp className="w-4 h-4" />
