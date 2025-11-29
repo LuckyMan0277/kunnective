@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2 } from 'lucide-react'
+import { ArrowLeft, ThumbsUp, MessageCircle, Share2, Edit, Trash2, Rocket } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Idea, IdeaComment } from '@kunnective/shared'
 
@@ -204,14 +204,24 @@ export default function IdeaDetailPage() {
           {currentUserId === idea.author_id && (
             <div className="flex gap-2">
               <button
+                onClick={() => router.push(`/projects/new?source_idea_id=${idea.id}`)}
+                className="flex items-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 text-sm font-medium"
+                title="이 아이디어로 프로젝트 진행"
+              >
+                <Rocket className="w-4 h-4" />
+                <span>프로젝트 진행</span>
+              </button>
+              <button
                 onClick={() => router.push(`/ideas/${idea.id}/edit`)}
                 className="p-2 hover:bg-accent rounded-lg"
+                title="수정"
               >
                 <Edit className="w-4 h-4" />
               </button>
               <button
                 onClick={handleDelete}
                 className="p-2 hover:bg-destructive/10 text-destructive rounded-lg"
+                title="삭제"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

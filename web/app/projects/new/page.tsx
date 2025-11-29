@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
@@ -11,7 +11,7 @@ interface Position {
   description: string
 }
 
-export default function NewProjectPage() {
+function NewProjectForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [duration, setDuration] = useState('')
@@ -22,7 +22,33 @@ export default function NewProjectPage() {
   ])
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const sourceIdeaId = searchParams.get('source_idea_id')
   const supabase = createClient()
+
+  useEffect(() => {
+    if (sourceIdeaId) {
+      loadSourceIdea()
+    }
+  }, [sourceIdeaId])
+
+  async function loadSourceIdea() {
+    try {
+      const { data, error } = await supabase
+        .from('ideas')
+        .select('title, description')
+        .eq('id', sourceIdeaId)
+        .single()
+
+      if (error) throw error
+      if (data) {
+        setTitle(data.title)
+        setDescription(data.description)
+      }
+    } catch (error) {
+      console.error('Error loading source idea:', error)
+    }
+  }
 
   function addTech() {
     if (techInput.trim() && !techStack.includes(techInput.trim())) {
@@ -79,6 +105,7 @@ export default function NewProjectPage() {
           duration: duration || null,
           tech_stack: techStack,
           status: 'recruiting',
+          source_idea_id: sourceIdeaId || null,
         })
         .select()
         .single()
@@ -98,6 +125,17 @@ export default function NewProjectPage() {
         .insert(positionsToInsert)
 
       if (positionsError) throw positionsError
+
+      // 아이디어 상태 업데이트 (프로젝트로 전환됨)
+      if (sourceIdeaId) {
+        await supabase
+          .from('ideas')
+          .update({
+            status: 'converted_to_project',
+            converted_project_id: project.id
+          })
+          .eq('id', sourceIdeaId)
+      }
 
       router.push('/projects')
       router.refresh()
@@ -268,5 +306,13 @@ export default function NewProjectPage() {
         </div>
       </form>
     </div>
+  )
+}
+
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewProjectForm />
+    </Suspense>
   )
 }
