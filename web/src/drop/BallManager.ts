@@ -31,10 +31,11 @@ export class BallManager {
     this.balls.forEach(cb);
   }
 
-  spawnInitial(valuePerBall: number): void {
+  spawnInitial(valuePerBall: number, overrideX?: number): void {
     const { x, y, spreadX } = this.level.spawn;
+    const baseX = overrideX ?? x;
     const jitter = Phaser.Math.FloatBetween(-spreadX / 2, spreadX / 2);
-    const ball = this.createBall(x + jitter, y, valuePerBall, undefined);
+    const ball = this.createBall(baseX + jitter, y, valuePerBall, undefined);
     this.balls.add(ball);
   }
 

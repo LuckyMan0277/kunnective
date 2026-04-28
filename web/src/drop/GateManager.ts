@@ -8,6 +8,7 @@ interface GateRuntime<T> {
   label: Phaser.GameObjects.Text;
   currentX: number;
   direction: 1 | -1;
+  frozen: boolean;
 }
 
 export class GateManager {
@@ -33,7 +34,7 @@ export class GateManager {
       const color = g.multiplier >= 4 ? 0xa855f7 : g.multiplier === 3 ? 0x3b82f6 : 0x22c55e;
       const rect = this.scene.add.rectangle(g.x, g.y, g.width, 16, color, 0.85).setStrokeStyle(2, 0xffffff, 0.5);
       const label = this.scene.add.text(g.x, g.y, `x${g.multiplier}`, this.labelStyle(18)).setOrigin(0.5);
-      this.gates.push({ config: g, rect, label, currentX: g.x, direction: 1 });
+      this.gates.push({ config: g, rect, label, currentX: g.x, direction: 1, frozen: false });
     }
   }
 
@@ -41,7 +42,7 @@ export class GateManager {
     for (const d of this.level.deleteGates) {
       const rect = this.scene.add.rectangle(d.x, d.y, d.width, 16, 0xef4444, 0.85).setStrokeStyle(2, 0xffffff, 0.5);
       const label = this.scene.add.text(d.x, d.y, `-${d.remaining}`, this.labelStyle(16)).setOrigin(0.5);
-      this.deletes.push({ config: { ...d }, rect, label, currentX: d.x, direction: 1 });
+      this.deletes.push({ config: { ...d }, rect, label, currentX: d.x, direction: 1, frozen: false });
     }
   }
 
@@ -49,7 +50,7 @@ export class GateManager {
     for (const p of this.level.pads) {
       const rect = this.scene.add.rectangle(p.x, p.y, p.width, p.height, 0x3b82f6, 0.85).setStrokeStyle(2, 0xffffff, 0.5);
       const label = this.scene.add.text(p.x, p.y, '↑', this.labelStyle(20)).setOrigin(0.5);
-      this.pads.push({ config: p, rect, label, currentX: p.x, direction: 1 });
+      this.pads.push({ config: p, rect, label, currentX: p.x, direction: 1, frozen: false });
     }
   }
 
@@ -57,6 +58,7 @@ export class GateManager {
     for (const g of this.gates) {
       const cfg = g.config;
       if (!cfg.moving) continue;
+      if (g.frozen) continue;
       const speed = cfg.speed ?? 60;
       g.currentX += g.direction * speed * dt;
       if (cfg.maxX !== undefined && g.currentX >= cfg.maxX) {
@@ -102,6 +104,9 @@ export class GateManager {
         const crossedUp = prevY > gy && currentY <= gy;
         if (crossedDown || crossedUp) {
           ball.usedTriggerIds.add(cfg.id);
+          if (cfg.moving) {
+            g.frozen = true;
+          }
           this.applyMultiplier(ball, cfg);
         }
       }

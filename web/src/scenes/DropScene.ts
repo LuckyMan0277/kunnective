@@ -31,7 +31,9 @@ export class DropScene extends Phaser.Scene {
   private uiSpawned!: Phaser.GameObjects.Text;
   private uiAlive!: Phaser.GameObjects.Text;
   private uiResult!: Phaser.GameObjects.Text;
-  private dropButton!: Phaser.GameObjects.Rectangle;
+  private indicator!: Phaser.GameObjects.Triangle;
+  private dropX = 0;
+  private aiming = true;
   private endText?: Phaser.GameObjects.Text;
   private spawnTimer?: Phaser.Time.TimerEvent;
 
@@ -65,6 +67,18 @@ export class DropScene extends Phaser.Scene {
 
     this.drawCollector();
     this.buildUi();
+
+    this.dropX = this.level.spawn.x;
+    this.aiming = true;
+    this.indicator = this.add.triangle(
+      this.dropX,
+      this.level.spawn.y - 14,
+      0, -8,
+      8, 8,
+      -8, 8,
+      0xfde047,
+    ).setStrokeStyle(1, 0xffffff, 0.8);
+    this.setupInput();
   }
 
   private drawCollector(): void {
@@ -79,11 +93,7 @@ export class DropScene extends Phaser.Scene {
     this.uiAlive = this.add.text(8, 44, '', baseStyle);
     this.uiResult = this.add.text(8, 62, '', baseStyle);
 
-    const btnX = 200;
-    const btnY = 30;
-    this.dropButton = this.add.rectangle(btnX, btnY, 110, 40, 0x8b5cf6).setStrokeStyle(2, 0xffffff, 0.7);
-    this.add.text(btnX, btnY, 'DROP', { ...baseStyle, fontSize: '18px', fontStyle: 'bold' }).setOrigin(0.5);
-    this.dropButton.setInteractive({ useHandCursor: true }).on('pointerup', () => this.startDrop());
+    this.add.text(390, 8, 'Drag & release to drop', { fontFamily: 'system-ui, sans-serif', fontSize: '12px', color: '#fde047' }).setOrigin(1, 0);
 
     this.refreshUi();
   }
@@ -92,7 +102,6 @@ export class DropScene extends Phaser.Scene {
     if (this.dropping || this.finished) return;
     this.dropping = true;
     this.startedAt = this.time.now;
-    this.dropButton.setFillStyle(0x6b7280);
     this.spawnTimer = this.time.addEvent({
       delay: this.level.spawn.intervalMs,
       repeat: this.targetSpawnCount - 1,
@@ -113,7 +122,7 @@ export class DropScene extends Phaser.Scene {
       this.spawnedBalls++;
       return;
     }
-    this.ballManager.spawnInitial(this.valuePerBall);
+    this.ballManager.spawnInitial(this.valuePerBall, this.dropX);
     this.spawnedBalls++;
   }
 
@@ -169,5 +178,27 @@ export class DropScene extends Phaser.Scene {
       align: 'center',
     }).setOrigin(0.5);
     this.endText.setStroke('#000000', 4);
+  }
+
+  private setupInput(): void {
+    const minX = 42;
+    const maxX = 358;
+    const updateIndicator = (x: number) => {
+      if (!this.aiming) return;
+      this.dropX = Phaser.Math.Clamp(x, minX, maxX);
+      this.indicator.setX(this.dropX);
+    };
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => updateIndicator(p.x));
+    this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
+      if (!p.isDown) return;
+      updateIndicator(p.x);
+    });
+    this.input.on('pointerup', (p: Phaser.Input.Pointer) => {
+      updateIndicator(p.x);
+      if (!this.aiming) return;
+      this.aiming = false;
+      this.indicator.setVisible(false);
+      this.startDrop();
+    });
   }
 }
