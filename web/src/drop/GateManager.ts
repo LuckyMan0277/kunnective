@@ -145,6 +145,10 @@ export class GateManager {
         if (enteredFromAbove) {
           ball.usedTriggerIds.add(cfg.id);
           ball.setVelocity(cfg.bounceVx ?? 0, cfg.bounceVy);
+          // 발판을 밟은 공은 multiplier 게이트를 다시 발동할 수 있게 한다
+          for (const mg of this.gates) {
+            ball.usedTriggerIds.delete(mg.config.id);
+          }
         }
       }
 

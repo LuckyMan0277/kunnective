@@ -19,18 +19,18 @@ export const testLevel: LevelConfig = {
 
     { id: 'guideX4', type: 'ramp', x: 320, y: 320, length: 90, thickness: 8, angle: -25 },
 
-    { id: 'funnelL', type: 'ramp', x: 130, y: 700, length: 130, thickness: 12, angle: 25 },
-    { id: 'funnelR', type: 'ramp', x: 270, y: 700, length: 130, thickness: 12, angle: -25 },
+    { id: 'funnelL', type: 'ramp', x: 83, y: 700, length: 126, thickness: 12, angle: 25 },
+    { id: 'funnelR', type: 'ramp', x: 317, y: 700, length: 126, thickness: 12, angle: -25 },
   ],
 
   gates: [
-    { id: 'g1', type: 'multiplier', x: 200, y: 160, width: 110, multiplier: 2, moving: false },
+    { id: 'g1', type: 'multiplier', x: 200, y: 160, width: 130, multiplier: 2, moving: false },
 
-    { id: 'g2', type: 'multiplier', x: 200, y: 280, width: 90, multiplier: 3, moving: true, minX: 130, maxX: 270, speed: 80 },
+    { id: 'g2', type: 'multiplier', x: 200, y: 280, width: 110, multiplier: 3, moving: true, minX: 130, maxX: 270, speed: 80 },
 
-    { id: 'g3', type: 'multiplier', x: 310, y: 430, width: 70, multiplier: 4, moving: false },
+    { id: 'g3', type: 'multiplier', x: 310, y: 430, width: 90, multiplier: 4, moving: false },
 
-    { id: 'g4', type: 'multiplier', x: 100, y: 360, width: 90, multiplier: 2, moving: false },
+    { id: 'g4', type: 'multiplier', x: 100, y: 360, width: 110, multiplier: 2, moving: false },
   ],
 
   deleteGates: [
