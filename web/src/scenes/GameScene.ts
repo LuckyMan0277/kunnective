@@ -1,250 +1,318 @@
 import Phaser from 'phaser';
 
-const BOARD_TOP = 200;
-const PIN_ROWS = 8;
-const PIN_COLS = 7;
-const PIN_ROW_SPACING = 60;
-const PIN_COL_SPACING = 70;
-const PIN_RADIUS = 6;
-const SLOT_Y = 880;
-const SLOT_WIDTH = 70;
-const SLOT_HEIGHT = 70;
-const SLOT_VALUES = [10, 5, 3, 2, 3, 5, 10] as const;
-const SLOT_COLORS = [0xef4444, 0xf97316, 0xfacc15, 0x22c55e, 0xfacc15, 0xf97316, 0xef4444] as const;
-const CUP_RADIUS = 18;
-const INITIAL_BALLS = 100;
-const DROPS_PER_ROUND = 3;
 const GAME_WIDTH = 540;
-const INDICATOR_Y = 80;
-const INDICATOR_MIN_X = 40;
-const INDICATOR_MAX_X = GAME_WIDTH - 40;
+const GAME_HEIGHT = 960;
+const CUP_Y = 100;
+const CUP_WIDTH = 60;
+const CUP_HEIGHT = 40;
+const CUP_MIN_X = CUP_WIDTH / 2 + 20;
+const CUP_MAX_X = GAME_WIDTH - CUP_WIDTH / 2 - 20;
+const POUR_BALL_COUNT = 20;
+const POUR_INTERVAL_MS = 60;
+const DROPS_PER_ROUND = 3;
+const BALL_RADIUS = 6;
+const GATE_WIDTH = 70;
+const GATE_HEIGHT = 60;
+const GATE_GAP = 90;
+const GATE_ROW_Y = 640;
+const GATE_INITIAL_SPEED = 80;
+const GATE_SPEED_STEP = 20;
+const GATE_SPEED_MAX = 200;
+const GATE_SPEED_INTERVAL_MS = 5000;
+const COLLECTOR_Y = 900;
 
-type CupImage = Phaser.Physics.Matter.Image & { resolved?: boolean };
+type GateKind = 'x2' | 'x3' | 'x4' | 'penalty' | 'trampoline' | 'mystery';
 
-interface SlotData {
-  multiplier: number;
-  body: MatterJS.BodyType;
+interface GateDef {
+  kind: GateKind;
+  color: number;
+  label: string;
 }
 
+const ALL_GATES: GateDef[] = [
+  { kind: 'x2', color: 0x22c55e, label: 'x2' },
+  { kind: 'x3', color: 0x3b82f6, label: 'x3' },
+  { kind: 'x4', color: 0xa855f7, label: 'x4' },
+  { kind: 'penalty', color: 0xef4444, label: '÷5' },
+  { kind: 'trampoline', color: 0xfacc15, label: '↑' },
+  { kind: 'mystery', color: 0x6b7280, label: '?' },
+];
+
+interface Gate {
+  kind: GateKind;
+  rect: Phaser.GameObjects.Rectangle;
+  label: Phaser.GameObjects.Text;
+  body: MatterJS.BodyType;
+  groupOffsetX: number;
+}
+
+type BallSprite = Phaser.Physics.Matter.Image & { value?: number; passed?: Set<MatterJS.BodyType>; counted?: boolean };
+
 export class GameScene extends Phaser.Scene {
-  private indicatorX = GAME_WIDTH / 2;
-  private indicator!: Phaser.GameObjects.Triangle;
-  private guideline!: Phaser.GameObjects.Graphics;
-
+  private cupX = GAME_WIDTH / 2;
+  private cup!: Phaser.GameObjects.Rectangle;
   private dropsRemaining = DROPS_PER_ROUND;
-  private dropsResolved = 0;
   private ballsThisRound = 0;
-
   private dropsText!: Phaser.GameObjects.Text;
   private ballsText!: Phaser.GameObjects.Text;
+  private gates: Gate[] = [];
+  private gateGroupX = 0;
+  private gateSpeed = GATE_INITIAL_SPEED;
+  private gateDirection = 1;
+  private collectorBody!: MatterJS.BodyType;
+  private activeBalls = new Set<BallSprite>();
+  private ballTextureKey = 'ballTexture';
+  private pouring = false;
   private roundEndContainer!: Phaser.GameObjects.Container;
-
-  private slots: SlotData[] = [];
-  private cupTextureKey = 'cupTexture';
+  private gateGroupMinX = 0;
+  private gateGroupMaxX = 0;
 
   constructor() {
     super('GameScene');
   }
 
   create(): void {
-    this.createCupTexture();
+    this.createTextures();
     this.createWalls();
-    this.createPins();
-    this.createSlots();
-    this.createIndicator();
+    this.createCollector();
+    this.createGates();
+    this.createCup();
     this.createHud();
     this.createRoundEndOverlay();
     this.setupInput();
     this.setupCollisions();
+    this.scheduleSpeedUp();
     this.refreshHud();
   }
 
-  private createCupTexture(): void {
+  private createTextures(): void {
     const g = this.make.graphics({ x: 0, y: 0 }, false);
-    g.fillStyle(0x8b5cf6, 1);
-    g.fillCircle(CUP_RADIUS, CUP_RADIUS, CUP_RADIUS);
-    g.lineStyle(2, 0xffffff, 0.6);
-    g.strokeCircle(CUP_RADIUS, CUP_RADIUS, CUP_RADIUS);
-    g.generateTexture(this.cupTextureKey, CUP_RADIUS * 2, CUP_RADIUS * 2);
+    g.fillStyle(0xffffff, 1);
+    g.fillCircle(BALL_RADIUS, BALL_RADIUS, BALL_RADIUS);
+    g.lineStyle(1, 0xfde047, 1);
+    g.strokeCircle(BALL_RADIUS, BALL_RADIUS, BALL_RADIUS);
+    g.generateTexture(this.ballTextureKey, BALL_RADIUS * 2, BALL_RADIUS * 2);
     g.destroy();
   }
 
   private createWalls(): void {
-    // invisible side walls + ceiling so cups stay inside the play area
-    const wallThickness = 40;
-    const height = this.scale.height;
-    const opts = { isStatic: true, restitution: 0.2, friction: 0.1 };
-    this.matter.add.rectangle(-wallThickness / 2, height / 2, wallThickness, height, opts);
-    this.matter.add.rectangle(GAME_WIDTH + wallThickness / 2, height / 2, wallThickness, height, opts);
-    this.matter.add.rectangle(GAME_WIDTH / 2, -wallThickness / 2, GAME_WIDTH, wallThickness, opts);
+    const t = 40;
+    const opts = { isStatic: true, restitution: 0.1, friction: 0.05 };
+    this.matter.add.rectangle(-t / 2, GAME_HEIGHT / 2, t, GAME_HEIGHT, opts);
+    this.matter.add.rectangle(GAME_WIDTH + t / 2, GAME_HEIGHT / 2, t, GAME_HEIGHT, opts);
+    this.matter.add.rectangle(GAME_WIDTH / 2, -t / 2, GAME_WIDTH, t, opts);
   }
 
-  private createPins(): void {
-    for (let row = 0; row < PIN_ROWS; row++) {
-      const offsetX = (row % 2) * (PIN_COL_SPACING / 2);
-      const usableWidth = (PIN_COLS - 1) * PIN_COL_SPACING;
-      const startX = (GAME_WIDTH - usableWidth) / 2;
-      const y = BOARD_TOP + row * PIN_ROW_SPACING;
-      for (let col = 0; col < PIN_COLS; col++) {
-        const x = startX + col * PIN_COL_SPACING + offsetX;
-        if (x < 20 || x > GAME_WIDTH - 20) continue;
-        this.add.circle(x, y, PIN_RADIUS, 0xffffff);
-        this.matter.add.circle(x, y, PIN_RADIUS, { isStatic: true, restitution: 0.6, friction: 0.05 });
-      }
-    }
-  }
-
-  private createSlots(): void {
-    const totalWidth = SLOT_VALUES.length * SLOT_WIDTH;
-    const startX = (GAME_WIDTH - totalWidth) / 2 + SLOT_WIDTH / 2;
-    SLOT_VALUES.forEach((multiplier, i) => {
-      const x = startX + i * SLOT_WIDTH;
-      const color = SLOT_COLORS[i];
-      this.add.rectangle(x, SLOT_Y, SLOT_WIDTH - 4, SLOT_HEIGHT, color, 0.85).setStrokeStyle(2, 0xffffff, 0.4);
-      this.add.text(x, SLOT_Y, `x${multiplier}`, {
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: '20px',
-        color: '#ffffff',
-        fontStyle: 'bold',
-      }).setOrigin(0.5);
-      const body = this.matter.add.rectangle(x, SLOT_Y, SLOT_WIDTH - 4, SLOT_HEIGHT, {
-        isStatic: true,
-        isSensor: true,
-        label: `slot:${i}`,
-      });
-      this.slots.push({ multiplier, body });
+  private createCollector(): void {
+    this.collectorBody = this.matter.add.rectangle(GAME_WIDTH / 2, COLLECTOR_Y, GAME_WIDTH, 40, {
+      isStatic: true,
+      isSensor: true,
+      label: 'collector',
     });
   }
 
-  private createIndicator(): void {
-    this.guideline = this.add.graphics();
-    this.indicator = this.add.triangle(
-      this.indicatorX,
-      INDICATOR_Y,
-      0, -10,
-      10, 10,
-      -10, 10,
-      0xffffff,
-    );
-    this.drawGuideline();
+  private createGates(): void {
+    const picked = this.pickGates();
+    const totalWidth = picked.length * GATE_WIDTH + (picked.length - 1) * (GATE_GAP - GATE_WIDTH);
+    const startX = (GAME_WIDTH - totalWidth) / 2 + GATE_WIDTH / 2;
+
+    picked.forEach((def, i) => {
+      const offsetX = startX + i * GATE_GAP - GAME_WIDTH / 2;
+      const x = GAME_WIDTH / 2 + offsetX;
+      const rect = this.add.rectangle(x, GATE_ROW_Y, GATE_WIDTH, GATE_HEIGHT, def.color, 0.9)
+        .setStrokeStyle(2, 0xffffff, 0.5);
+      const label = this.add.text(x, GATE_ROW_Y, def.label, {
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: '24px',
+        color: '#ffffff',
+        fontStyle: 'bold',
+      }).setOrigin(0.5);
+      const body = this.matter.add.rectangle(x, GATE_ROW_Y, GATE_WIDTH, GATE_HEIGHT, {
+        isStatic: true,
+        isSensor: true,
+        label: `gate:${def.kind}:${i}`,
+      });
+      this.gates.push({ kind: def.kind, rect, label, body, groupOffsetX: offsetX });
+    });
+
+    const halfTotal = totalWidth / 2;
+    this.gateGroupMinX = halfTotal + 10;
+    this.gateGroupMaxX = GAME_WIDTH - halfTotal - 10;
   }
 
-  private drawGuideline(): void {
-    this.guideline.clear();
-    this.guideline.lineStyle(1, 0xffffff, 0.25);
-    const x = this.indicatorX;
-    let y = INDICATOR_Y + 20;
-    while (y < BOARD_TOP - 10) {
-      this.guideline.lineBetween(x, y, x, y + 8);
-      y += 16;
-    }
+  private pickGates(): GateDef[] {
+    const pool = [...ALL_GATES];
+    const result: GateDef[] = [];
+    const penalty = pool.splice(pool.findIndex(g => g.kind === 'penalty'), 1)[0];
+    result.push(penalty);
+    const positiveKinds: GateKind[] = ['x2', 'x3', 'x4'];
+    const positivePool = pool.filter(g => positiveKinds.includes(g.kind));
+    const positivePick = positivePool[Math.floor(Math.random() * positivePool.length)];
+    result.push(positivePick);
+    const remaining = pool.filter(g => g !== positivePick);
+    Phaser.Utils.Array.Shuffle(remaining);
+    result.push(remaining[0], remaining[1]);
+    Phaser.Utils.Array.Shuffle(result);
+    return result;
+  }
+
+  private createCup(): void {
+    this.cup = this.add.rectangle(this.cupX, CUP_Y, CUP_WIDTH, CUP_HEIGHT, 0x8b5cf6, 1)
+      .setStrokeStyle(2, 0xffffff, 0.7);
   }
 
   private createHud(): void {
-    const style = {
-      fontFamily: 'system-ui, sans-serif',
-      fontSize: '20px',
-      color: '#ffffff',
-    };
+    const style = { fontFamily: 'system-ui, sans-serif', fontSize: '20px', color: '#ffffff' };
     this.dropsText = this.add.text(20, 20, '', style);
     this.ballsText = this.add.text(GAME_WIDTH - 20, 20, '', style).setOrigin(1, 0);
   }
 
   private createRoundEndOverlay(): void {
-    const bg = this.add.rectangle(GAME_WIDTH / 2, this.scale.height / 2, GAME_WIDTH, 240, 0x000000, 0.7);
-    const title = this.add.text(0, -50, '', {
+    const bg = this.add.rectangle(0, 0, GAME_WIDTH, 240, 0x000000, 0.75);
+    const title = this.add.text(0, -40, '', {
       fontFamily: 'system-ui, sans-serif',
       fontSize: '28px',
       color: '#ffffff',
       fontStyle: 'bold',
+      align: 'center',
     }).setOrigin(0.5);
-    const button = this.add.rectangle(0, 40, 200, 60, 0x8b5cf6).setStrokeStyle(2, 0xffffff, 0.6);
-    const buttonText = this.add.text(0, 40, 'Tap to Restart', {
+    const button = this.add.rectangle(0, 50, 220, 60, 0x8b5cf6).setStrokeStyle(2, 0xffffff, 0.6);
+    const buttonText = this.add.text(0, 50, 'Tap to Restart', {
       fontFamily: 'system-ui, sans-serif',
       fontSize: '20px',
       color: '#ffffff',
     }).setOrigin(0.5);
     button.setInteractive({ useHandCursor: true });
-    button.on('pointerup', () => this.restartRound());
+    button.on('pointerup', (_: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+      this.restartRound();
+    });
 
-    this.roundEndContainer = this.add.container(GAME_WIDTH / 2, this.scale.height / 2, [bg, title, button, buttonText]);
+    this.roundEndContainer = this.add.container(GAME_WIDTH / 2, GAME_HEIGHT / 2, [bg, title, button, buttonText]);
     this.roundEndContainer.setVisible(false);
     this.roundEndContainer.setData('title', title);
   }
 
   private setupInput(): void {
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      this.updateIndicator(pointer.x);
+      if (pointer.y > GAME_HEIGHT - 200) return;
+      this.cupX = Phaser.Math.Clamp(pointer.x, CUP_MIN_X, CUP_MAX_X);
+      this.cup.setX(this.cupX);
     });
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.updateIndicator(pointer.x);
+      if (pointer.y > GAME_HEIGHT - 200) return;
+      this.cupX = Phaser.Math.Clamp(pointer.x, CUP_MIN_X, CUP_MAX_X);
+      this.cup.setX(this.cupX);
     });
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.y > this.scale.height - 100) return;
       if (this.roundEndContainer.visible) return;
-      this.dropCup();
+      if (pointer.y > GAME_HEIGHT - 200) return;
+      this.startPour();
     });
   }
 
-  private updateIndicator(x: number): void {
-    this.indicatorX = Phaser.Math.Clamp(x, INDICATOR_MIN_X, INDICATOR_MAX_X);
-    this.indicator.setX(this.indicatorX);
-    this.drawGuideline();
+  private startPour(): void {
+    if (this.pouring) return;
+    if (this.dropsRemaining <= 0) return;
+    this.pouring = true;
+    this.dropsRemaining--;
+    this.refreshHud();
+    let fired = 0;
+    const timer = this.time.addEvent({
+      delay: POUR_INTERVAL_MS,
+      repeat: POUR_BALL_COUNT - 1,
+      callback: () => {
+        this.spawnBall();
+        fired++;
+        if (fired >= POUR_BALL_COUNT) {
+          this.pouring = false;
+          timer.remove();
+        }
+      },
+    });
   }
 
-  private dropCup(): void {
-    if (this.dropsRemaining <= 0) return;
-    this.dropsRemaining--;
-    const cup = this.matter.add.image(this.indicatorX, INDICATOR_Y + 30, this.cupTextureKey, undefined, {
-      shape: { type: 'circle', radius: CUP_RADIUS },
-      restitution: 0.5,
+  private spawnBall(): void {
+    const jitter = Phaser.Math.Between(-6, 6);
+    const ball = this.matter.add.image(this.cupX + jitter, CUP_Y + CUP_HEIGHT / 2 + 4, this.ballTextureKey, undefined, {
+      shape: { type: 'circle', radius: BALL_RADIUS },
+      restitution: 0.2,
       friction: 0.05,
-      density: 0.002,
-    }) as CupImage;
-    cup.resolved = false;
-    this.refreshHud();
+      density: 0.001,
+    }) as BallSprite;
+    ball.value = 1;
+    ball.passed = new Set();
+    ball.counted = false;
+    ball.setVelocity(Phaser.Math.FloatBetween(-0.4, 0.4), 0.5);
+    this.activeBalls.add(ball);
   }
 
   private setupCollisions(): void {
     this.matter.world.on('collisionstart', (event: Phaser.Physics.Matter.Events.CollisionStartEvent) => {
       for (const pair of event.pairs) {
-        const slot = this.slots.find(s => s.body === pair.bodyA || s.body === pair.bodyB);
-        if (!slot) continue;
-        const otherBody = slot.body === pair.bodyA ? pair.bodyB : pair.bodyA;
-        const cup = otherBody.gameObject as CupImage | null;
-        if (!cup || cup.resolved) continue;
-        cup.resolved = true;
-        this.resolveCup(cup, slot.multiplier);
+        const a = pair.bodyA;
+        const b = pair.bodyB;
+        const collectorPair = (a === this.collectorBody || b === this.collectorBody);
+        if (collectorPair) {
+          const otherBody = a === this.collectorBody ? b : a;
+          const ball = otherBody.gameObject as BallSprite | null;
+          if (ball && !ball.counted) {
+            this.collectBall(ball);
+          }
+          continue;
+        }
+        const gate = this.gates.find(g => g.body === a || g.body === b);
+        if (!gate) continue;
+        const otherBody = gate.body === a ? b : a;
+        const ball = otherBody.gameObject as BallSprite | null;
+        if (!ball || !ball.passed) continue;
+        if (ball.passed.has(gate.body)) continue;
+        ball.passed.add(gate.body);
+        this.applyGateEffect(ball, gate);
       }
     });
   }
 
-  private resolveCup(cup: CupImage, multiplier: number): void {
-    const finalBalls = INITIAL_BALLS * multiplier;
-    this.ballsThisRound += finalBalls;
-    this.spawnPopup(cup.x, cup.y - 20, `+${finalBalls}`);
-    cup.destroy();
-    this.dropsResolved++;
-    this.refreshHud();
-    if (this.dropsResolved >= DROPS_PER_ROUND) {
-      this.showRoundEnd();
+  private applyGateEffect(ball: BallSprite, gate: Gate): void {
+    const value = ball.value ?? 1;
+    switch (gate.kind) {
+      case 'x2':
+        ball.value = value * 2;
+        break;
+      case 'x3':
+        ball.value = value * 3;
+        break;
+      case 'x4':
+        ball.value = value * 4;
+        break;
+      case 'penalty':
+        ball.value = Math.max(0, Math.floor(value / 5));
+        break;
+      case 'trampoline':
+        ball.setVelocityY(-12);
+        break;
+      case 'mystery': {
+        const m = Phaser.Math.Between(1, 5);
+        ball.value = value * m;
+        break;
+      }
     }
   }
 
-  private spawnPopup(x: number, y: number, text: string): void {
-    const popup = this.add.text(x, y, text, {
-      fontFamily: 'system-ui, sans-serif',
-      fontSize: '22px',
-      color: '#fde047',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
-    this.tweens.add({
-      targets: popup,
-      y: y - 60,
-      alpha: 0,
-      duration: 800,
-      onComplete: () => popup.destroy(),
-    });
+  private collectBall(ball: BallSprite): void {
+    ball.counted = true;
+    const value = ball.value ?? 0;
+    this.ballsThisRound += value;
+    this.activeBalls.delete(ball);
+    ball.destroy();
+    this.refreshHud();
+    this.maybeFinishRound();
+  }
+
+  private maybeFinishRound(): void {
+    if (this.dropsRemaining === 0 && !this.pouring && this.activeBalls.size === 0) {
+      this.showRoundEnd();
+    }
   }
 
   private refreshHud(): void {
@@ -255,15 +323,51 @@ export class GameScene extends Phaser.Scene {
   private showRoundEnd(): void {
     const title = this.roundEndContainer.getData('title') as Phaser.GameObjects.Text;
     title.setText(`Round End\n${this.ballsThisRound} balls`);
-    title.setAlign('center');
     this.roundEndContainer.setVisible(true);
   }
 
   private restartRound(): void {
+    this.activeBalls.forEach(b => b.destroy());
+    this.activeBalls.clear();
     this.dropsRemaining = DROPS_PER_ROUND;
-    this.dropsResolved = 0;
     this.ballsThisRound = 0;
+    this.gateSpeed = GATE_INITIAL_SPEED;
     this.roundEndContainer.setVisible(false);
     this.refreshHud();
+  }
+
+  private scheduleSpeedUp(): void {
+    this.time.addEvent({
+      delay: GATE_SPEED_INTERVAL_MS,
+      loop: true,
+      callback: () => {
+        this.gateSpeed = Math.min(GATE_SPEED_MAX, this.gateSpeed + GATE_SPEED_STEP);
+      },
+    });
+  }
+
+  update(_time: number, delta: number): void {
+    const dt = delta / 1000;
+    this.gateGroupX += this.gateDirection * this.gateSpeed * dt;
+    if (this.gateGroupX > this.gateGroupMaxX - GAME_WIDTH / 2) {
+      this.gateGroupX = this.gateGroupMaxX - GAME_WIDTH / 2;
+      this.gateDirection = -1;
+    } else if (this.gateGroupX < this.gateGroupMinX - GAME_WIDTH / 2) {
+      this.gateGroupX = this.gateGroupMinX - GAME_WIDTH / 2;
+      this.gateDirection = 1;
+    }
+    const groupCenter = GAME_WIDTH / 2 + this.gateGroupX;
+    this.gates.forEach(g => {
+      const x = groupCenter + g.groupOffsetX;
+      g.rect.setX(x);
+      g.label.setX(x);
+      (this.matter.body as unknown as { setPosition: (body: MatterJS.BodyType, position: { x: number; y: number }) => void }).setPosition(g.body, { x, y: GATE_ROW_Y });
+    });
+
+    this.activeBalls.forEach(ball => {
+      if (ball.y > GAME_HEIGHT + 50) {
+        if (!ball.counted) this.collectBall(ball);
+      }
+    });
   }
 }
