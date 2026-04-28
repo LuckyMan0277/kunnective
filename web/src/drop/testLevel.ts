@@ -17,9 +17,6 @@ export const testLevel: LevelConfig = {
 
     { id: 'divider1', type: 'rect', x: 200, y: 470, width: 10, height: 100 },
 
-    { id: 'rampLeft', type: 'ramp', x: 110, y: 200, length: 140, thickness: 10, angle: -20 },
-    { id: 'rampRight', type: 'ramp', x: 290, y: 200, length: 140, thickness: 10, angle: 20 },
-
     { id: 'guideX4', type: 'ramp', x: 320, y: 320, length: 90, thickness: 8, angle: -25 },
 
     { id: 'funnelL', type: 'ramp', x: 130, y: 700, length: 130, thickness: 12, angle: 25 },
