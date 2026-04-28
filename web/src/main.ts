@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GameScene } from './scenes/GameScene';
+import { DropScene } from './scenes/DropScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -8,8 +8,8 @@ const config: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 540,
-    height: 960,
+    width: 400,
+    height: 800,
   },
   physics: {
     default: 'matter',
@@ -21,7 +21,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [GameScene],
+  scene: [DropScene],
 };
 
 new Phaser.Game(config);
