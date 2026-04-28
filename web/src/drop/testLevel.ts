@@ -41,7 +41,7 @@ export const testLevel: LevelConfig = {
   ],
 
   pads: [
-    { id: 'p1', type: 'bounce', x: 130, y: 600, width: 110, height: 16, bounceVy: -13, bounceVx: 1.2 },
+    { id: 'p1', type: 'bounce', x: 130, y: 600, width: 110, height: 16, bounceVy: -28, bounceVx: 0 },
   ],
 
   collector: {

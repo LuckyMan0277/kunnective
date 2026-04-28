@@ -31,7 +31,6 @@ export class DropScene extends Phaser.Scene {
   private uiSpawned!: Phaser.GameObjects.Text;
   private uiAlive!: Phaser.GameObjects.Text;
   private uiResult!: Phaser.GameObjects.Text;
-  private indicator!: Phaser.GameObjects.Triangle;
   private dropX = 0;
   private aiming = true;
   private endText?: Phaser.GameObjects.Text;
@@ -70,14 +69,6 @@ export class DropScene extends Phaser.Scene {
 
     this.dropX = this.level.spawn.x;
     this.aiming = true;
-    this.indicator = this.add.triangle(
-      this.dropX,
-      this.level.spawn.y - 14,
-      0, -8,
-      8, 8,
-      -8, 8,
-      0xfde047,
-    ).setStrokeStyle(1, 0xffffff, 0.8);
     this.setupInput();
   }
 
@@ -186,7 +177,6 @@ export class DropScene extends Phaser.Scene {
     const updateIndicator = (x: number) => {
       if (!this.aiming) return;
       this.dropX = Phaser.Math.Clamp(x, minX, maxX);
-      this.indicator.setX(this.dropX);
     };
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => updateIndicator(p.x));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
@@ -197,7 +187,6 @@ export class DropScene extends Phaser.Scene {
       updateIndicator(p.x);
       if (!this.aiming) return;
       this.aiming = false;
-      this.indicator.setVisible(false);
       this.startDrop();
     });
   }
