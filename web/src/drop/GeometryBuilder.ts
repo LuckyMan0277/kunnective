@@ -19,7 +19,8 @@ export class GeometryBuilder {
         scene.matter.add.rectangle(e.x, e.y, length, thickness, {
           isStatic: true,
           angle: angleRad,
-          friction: 0.1,
+          friction: 0,
+          frictionStatic: 0,
           restitution: 0.2,
         });
       }
