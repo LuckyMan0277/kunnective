@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { BallSprite, LevelConfig } from './types';
 
 const BALL_RADIUS = 6;
-const BALL_TEXTURE_KEY = 'ballTexture';
+export const BALL_TEXTURE_KEY = 'ballTexture';
 const BALL_LIFETIME_MS = 15000;
 
 export class BallManager {

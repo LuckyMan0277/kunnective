@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import type { LevelConfig } from '../drop/types';
 import { testLevel } from '../drop/testLevel';
 import { GeometryBuilder } from '../drop/GeometryBuilder';
-import { BallManager } from '../drop/BallManager';
+import { BallManager, BALL_TEXTURE_KEY } from '../drop/BallManager';
 import { GateManager } from '../drop/GateManager';
 
 export interface DropSceneInit {
@@ -33,6 +33,7 @@ export class DropScene extends Phaser.Scene {
   private uiResult!: Phaser.GameObjects.Text;
   private dropX = 0;
   private aiming = true;
+  private indicator!: Phaser.GameObjects.Image;
   private endText?: Phaser.GameObjects.Text;
   private spawnTimer?: Phaser.Time.TimerEvent;
 
@@ -68,6 +69,9 @@ export class DropScene extends Phaser.Scene {
     this.buildUi();
 
     this.dropX = this.level.spawn.x;
+    this.indicator = this.add.image(this.dropX, this.level.spawn.y, BALL_TEXTURE_KEY)
+      .setAlpha(0.6)
+      .setScale(1.4);
     this.aiming = true;
     this.setupInput();
   }
@@ -177,6 +181,7 @@ export class DropScene extends Phaser.Scene {
     const updateIndicator = (x: number) => {
       if (!this.aiming) return;
       this.dropX = Phaser.Math.Clamp(x, minX, maxX);
+      this.indicator.setX(this.dropX);
     };
     this.input.on('pointerdown', (p: Phaser.Input.Pointer) => updateIndicator(p.x));
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => {
@@ -187,6 +192,7 @@ export class DropScene extends Phaser.Scene {
       updateIndicator(p.x);
       if (!this.aiming) return;
       this.aiming = false;
+      this.indicator.setVisible(false);
       this.startDrop();
     });
   }
