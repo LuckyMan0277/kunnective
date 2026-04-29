@@ -90,6 +90,11 @@ export class DropScene extends Phaser.Scene {
 
     this.add.text(390, 8, 'Drag & release to drop', { fontFamily: 'system-ui, sans-serif', fontSize: '12px', color: '#fde047' }).setOrigin(1, 0);
 
+    this.add.text(390, 780, 'Editor', { fontFamily: 'system-ui, sans-serif', fontSize: '12px', color: '#60a0ff' })
+      .setOrigin(1, 1)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerup', () => this.scene.start('EditorScene', { level: this.level }));
+
     this.refreshUi();
   }
 

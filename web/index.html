@@ -14,17 +14,91 @@
       padding: 0;
       box-sizing: border-box;
     }
-    html, body {
-      width: 100%;
+    body {
+      margin: 0;
+      padding: 0;
       height: 100dvh;
-      background: #0b1220;
       overflow: hidden;
+      background: #0b1220;
       touch-action: none;
+    }
+    #game {
+      position: absolute;
+      inset: 0 240px 0 0;
+    }
+    #editor-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 240px;
+      height: 100dvh;
+      overflow-y: auto;
+      background: rgba(15, 23, 42, 0.92);
+      color: #f1f5f9;
+      padding: 8px 10px;
+      font: 12px system-ui, sans-serif;
+      z-index: 10;
+      box-sizing: border-box;
+      border-left: 1px solid #334155;
+    }
+    #editor-overlay h3 {
+      margin: 8px 0 4px;
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    #editor-overlay button {
+      margin: 2px;
+      padding: 4px 8px;
+      background: #334155;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      cursor: pointer;
+      font: 12px system-ui;
+    }
+    #editor-overlay button.active {
+      background: #8b5cf6;
+      border-color: #a78bfa;
+    }
+    #editor-overlay input,
+    #editor-overlay select {
+      width: 70px;
+      padding: 2px 4px;
+      background: #1e293b;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      border-radius: 3px;
+      font: 12px monospace;
+    }
+    #editor-overlay label {
+      display: inline-block;
+      margin-right: 6px;
+      min-width: 70px;
+      color: #cbd5e1;
+    }
+    .ed-row {
+      margin: 2px 0;
+    }
+    .ed-tools,
+    .ed-section {
+      margin-bottom: 6px;
+    }
+    #ed-export-out {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #475569;
+      padding: 4px;
+      font: 11px monospace;
+      box-sizing: border-box;
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <div id="game"></div>
+  <div id="editor-overlay"></div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

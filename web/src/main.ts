@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { EditorScene } from './scenes/EditorScene';
 import { DropScene } from './scenes/DropScene';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -21,7 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false,
     },
   },
-  scene: [DropScene],
+  scene: [EditorScene, DropScene],
 };
 
 new Phaser.Game(config);
