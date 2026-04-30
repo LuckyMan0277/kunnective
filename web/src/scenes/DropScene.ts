@@ -5,6 +5,8 @@ import { GeometryBuilder } from '../drop/GeometryBuilder';
 import { BallManager, BALL_TEXTURE_KEY } from '../drop/BallManager';
 import { GateManager } from '../drop/GateManager';
 
+const COLOR_COLLECTOR = 0x8bd3dd;
+
 export interface DropSceneInit {
   level?: LevelConfig;
   onDropComplete?: (resultBalls: number) => void;
@@ -47,6 +49,7 @@ export class DropScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.cameras.main.setBackgroundColor('#fef6e4');
     this.inputBalls = this.level.inputBalls;
     if (this.inputBalls > this.level.maxPhysicalBalls) {
       this.targetSpawnCount = this.level.maxPhysicalBalls;
@@ -78,19 +81,26 @@ export class DropScene extends Phaser.Scene {
 
   private drawCollector(): void {
     const c = this.level.collector;
-    this.add.rectangle(c.x, c.y, c.width, c.height, 0xfacc15, 0.25).setStrokeStyle(2, 0xfde047, 0.7);
+    this.add.rectangle(c.x, c.y, c.width, c.height, COLOR_COLLECTOR, 0.25).setStrokeStyle(2, 0x2d2a4a, 0.18);
   }
 
   private buildUi(): void {
-    const baseStyle = { fontFamily: 'system-ui, sans-serif', fontSize: '14px', color: '#ffffff' };
+    const baseStyle = { fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', fontSize: '16px', fontStyle: '700', color: '#2d2a4a' };
     this.uiInput = this.add.text(8, 8, '', baseStyle);
     this.uiSpawned = this.add.text(8, 26, '', baseStyle);
     this.uiAlive = this.add.text(8, 44, '', baseStyle);
     this.uiResult = this.add.text(8, 62, '', baseStyle);
 
-    this.add.text(390, 8, 'Drag & release to drop', { fontFamily: 'system-ui, sans-serif', fontSize: '12px', color: '#fde047' }).setOrigin(1, 0);
+    this.add.text(390, 8, 'Drag & release to drop', { fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', fontSize: '12px', color: '#2d2a4a' }).setOrigin(1, 0);
 
-    this.add.text(390, 780, 'Editor', { fontFamily: 'system-ui, sans-serif', fontSize: '12px', color: '#60a0ff' })
+    this.add.text(390, 780, 'Editor', {
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+      fontSize: '14px',
+      fontStyle: '600',
+      color: '#2d2a4a',
+      backgroundColor: '#8bd3dd',
+      padding: { left: 14, right: 14, top: 8, bottom: 8 },
+    })
       .setOrigin(1, 1)
       .setInteractive({ useHandCursor: true })
       .on('pointerup', () => this.scene.start('EditorScene', { level: this.level }));
@@ -171,13 +181,13 @@ export class DropScene extends Phaser.Scene {
 
   private showEndScreen(): void {
     this.endText = this.add.text(200, 400, `RESULT\n${this.resultBalls}`, {
-      fontFamily: 'system-ui, sans-serif',
+      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
       fontSize: '32px',
-      color: '#ffffff',
+      color: '#2d2a4a',
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5);
-    this.endText.setStroke('#000000', 4);
+    this.endText.setStroke('#ffffff', 4);
   }
 
   private setupInput(): void {

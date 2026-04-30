@@ -3,102 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="theme-color" content="#fff7ee">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="./manifest.webmanifest">
   <title>컵 드롭</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100dvh;
-      overflow: hidden;
-      background: #0b1220;
-      touch-action: none;
-    }
-    #game {
-      position: absolute;
-      inset: 0 240px 0 0;
-    }
-    #editor-overlay {
-      position: fixed;
-      top: 0;
-      right: 0;
-      width: 240px;
-      height: 100dvh;
-      overflow-y: auto;
-      background: rgba(15, 23, 42, 0.92);
-      color: #f1f5f9;
-      padding: 8px 10px;
-      font: 12px system-ui, sans-serif;
-      z-index: 10;
-      box-sizing: border-box;
-      border-left: 1px solid #334155;
-    }
-    #editor-overlay h3 {
-      margin: 8px 0 4px;
-      font-size: 11px;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    #editor-overlay button {
-      margin: 2px;
-      padding: 4px 8px;
-      background: #334155;
-      color: #f1f5f9;
-      border: 1px solid #475569;
-      border-radius: 4px;
-      cursor: pointer;
-      font: 12px system-ui;
-    }
-    #editor-overlay button.active {
-      background: #8b5cf6;
-      border-color: #a78bfa;
-    }
-    #editor-overlay input,
-    #editor-overlay select {
-      width: 70px;
-      padding: 2px 4px;
-      background: #1e293b;
-      color: #f1f5f9;
-      border: 1px solid #475569;
-      border-radius: 3px;
-      font: 12px monospace;
-    }
-    #editor-overlay label {
-      display: inline-block;
-      margin-right: 6px;
-      min-width: 70px;
-      color: #cbd5e1;
-    }
-    .ed-row {
-      margin: 2px 0;
-    }
-    .ed-tools,
-    .ed-section {
-      margin-bottom: 6px;
-    }
-    #ed-export-out {
-      background: #1e293b;
-      color: #cbd5e1;
-      border: 1px solid #475569;
-      padding: 4px;
-      font: 11px monospace;
-      box-sizing: border-box;
-      width: 100%;
-    }
+:root {
+  --c-bg: #fef6e4;
+  --c-surface: #ffffff;
+  --c-surface-2: #fff8ec;
+  --c-text: #2d2a4a;
+  --c-text-muted: #75748a;
+  --c-border: #e8dcc4;
+  --c-primary: #ff8ba7;
+  --c-primary-ink: #ffffff;
+  --c-mint: #8bd3dd;
+  --c-lavender: #a78bfa;
+  --c-amber: #f9c74f;
+  --c-danger: #e76f51;
+  --shadow-card: 0 4px 14px rgba(45, 42, 74, 0.08);
+  --shadow-active: 0 2px 6px rgba(255, 139, 167, 0.4);
+  --radius-card: 12px;
+  --radius-ctl: 8px;
+  --font-stack: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  height: 100dvh; overflow: hidden;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-stack);
+  font-size: 13px;
+  line-height: 1.45;
+  touch-action: none;
+}
+
+#game { position: absolute; inset: 0 260px 0 0; }
+
+#editor-overlay {
+  position: fixed; top: 0; right: 0;
+  width: 260px; height: 100dvh;
+  overflow-y: auto;
+  background: var(--c-surface);
+  border-left: 1px solid var(--c-border);
+  padding: 14px 12px;
+  box-shadow: var(--shadow-card);
+  z-index: 10;
+  display: block;
+}
+
+#editor-overlay h3 {
+  margin: 14px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+#editor-overlay h3:first-child { margin-top: 0; }
+
+#editor-overlay button {
+  margin: 3px 4px 3px 0;
+  padding: 7px 12px;
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-ctl);
+  cursor: pointer;
+  font: 600 13px var(--font-stack);
+  transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+#editor-overlay button:hover { transform: translateY(-1px); }
+#editor-overlay button:active { transform: translateY(0); }
+
+#editor-overlay button.active {
+  background: var(--c-primary);
+  color: var(--c-primary-ink);
+  border-color: var(--c-primary);
+  box-shadow: var(--shadow-active);
+}
+
+#editor-overlay button.ed-play {
+  background: var(--c-mint); color: var(--c-text); border-color: var(--c-mint);
+}
+#editor-overlay button.ed-export {
+  background: var(--c-lavender); color: #fff; border-color: var(--c-lavender);
+}
+#editor-overlay button.ed-delete {
+  background: var(--c-danger); color: #fff; border-color: var(--c-danger);
+}
+
+#editor-overlay input[type="number"],
+#editor-overlay input[type="text"],
+#editor-overlay select {
+  width: 78px; padding: 5px 8px;
+  background: var(--c-surface-2); color: var(--c-text);
+  border: 1px solid var(--c-border); border-radius: var(--radius-ctl);
+  font: 500 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+#editor-overlay input[type="checkbox"] { accent-color: var(--c-primary); transform: scale(1.1); margin-right: 4px; }
+
+#editor-overlay label {
+  display: inline-block; margin-right: 6px;
+  min-width: 78px; font-weight: 500; color: var(--c-text);
+}
+
+.ed-row { margin: 6px 0; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.ed-tools { display: flex; flex-wrap: wrap; gap: 4px; }
+.ed-section { margin-bottom: 14px; }
+
+#ed-export-out {
+  width: 100%; min-height: 120px; padding: 8px;
+  background: var(--c-surface-2); color: var(--c-text);
+  border: 1px solid var(--c-border); border-radius: var(--radius-ctl);
+  font: 500 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  resize: vertical;
+}
+
+#ed-panel-toggle {
+  position: fixed; top: 12px; left: 12px; z-index: 11;
+  padding: 8px 14px;
+  background: var(--c-primary); color: var(--c-primary-ink);
+  border: none; border-radius: var(--radius-ctl);
+  font: 600 13px var(--font-stack);
+  box-shadow: var(--shadow-active);
+  cursor: pointer;
+  display: none;
+}
+
+@media (max-width: 700px) {
+  #ed-panel-toggle { display: inline-block; }
+  #game { inset: 0 0 220px 0; }
+  #editor-overlay {
+    top: auto; bottom: 0; right: 0; left: 0;
+    width: 100%; height: 220px;
+    border-left: none; border-top: 1px solid var(--c-border);
+    transform: translateY(100%);
+    transition: transform 0.18s ease;
+  }
+  #editor-overlay.open { transform: translateY(0); }
+}
   </style>
 </head>
 <body>
   <div id="game"></div>
   <div id="editor-overlay"></div>
+  <button id="ed-panel-toggle" type="button" aria-label="Toggle editor panel">≡</button>
+  <script>
+    document.getElementById('ed-panel-toggle')?.addEventListener('click', () => {
+      const o = document.getElementById('editor-overlay');
+      if (!o) return;
+      o.classList.toggle('open');
+      const btn = document.getElementById('ed-panel-toggle');
+      if (btn) btn.textContent = o.classList.contains('open') ? '×' : '≡';
+    });
+  </script>
   <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

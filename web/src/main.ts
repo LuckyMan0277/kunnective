@@ -5,7 +5,7 @@ import { DropScene } from './scenes/DropScene';
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
-  backgroundColor: '#0b1220',
+  backgroundColor: '#fef6e4',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,

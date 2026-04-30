@@ -35,14 +35,22 @@ interface EditorEntity {
   intervalMs?: number;
 }
 
-const TOOL_COLORS: Record<string, number> = {
-  rect: 0x9ca3af,
-  ramp: 0x9ca3af,
-  multiplier: 0x9ca3af,
-  delete: 0xef4444,
-  bounce: 0x3b82f6,
-  spawn: 0xfbbf24,
-  collector: 0xfbbf24,
+const COLOR_WALL = 0x5e6472;
+const COLOR_RAMP = 0x9d8189;
+const COLOR_BOUNCE = 0xf9c74f;
+const COLOR_SPAWN = 0xff8ba7;
+const COLOR_COLLECTOR = 0x8bd3dd;
+const MULTIPLIER_COLORS: Record<number, number> = {
+  1.5: 0x8bd3dd,
+  2: 0xa78bfa,
+  3: 0xff8ba7,
+};
+const MULTIPLIER_FALLBACK = 0xa78bfa;
+
+const PALETTE = {
+  canvas: 0xfef6e4,
+  grid: 0xd4c5a3,
+  selectStroke: 0xff8ba7,
 };
 
 const GRID_COLS = 5;
@@ -85,7 +93,7 @@ export class EditorScene extends Phaser.Scene {
     const container = document.getElementById('editor-overlay');
     if (container) container.style.display = 'block';
 
-    this.add.rectangle(200, 400, 400, 800, 0x1f2937, 0.9);
+    this.add.rectangle(200, 400, 400, 800, PALETTE.canvas, 1);
 
     this.drawGrid();
     this.renderEntities();
@@ -103,7 +111,7 @@ export class EditorScene extends Phaser.Scene {
 
   private drawGrid(): void {
     const g = this.add.graphics();
-    g.lineStyle(1, 0x64748b, 0.25);
+    g.lineStyle(1, PALETTE.grid, 0.35);
     for (let c = 0; c <= GRID_COLS; c++) {
       g.lineBetween(c * GRID_CELL_W, 0, c * GRID_CELL_W, 800);
     }
@@ -273,7 +281,8 @@ export class EditorScene extends Phaser.Scene {
     this.collectorObj = undefined;
 
     this.spawnObj = this.add
-      .circle(this.spawn.x, this.spawn.y, 8, TOOL_COLORS.spawn)
+      .circle(this.spawn.x, this.spawn.y, 9, COLOR_SPAWN)
+      .setStrokeStyle(2, 0x2d2a4a, 0.18)
       .setInteractive({ draggable: this.currentTool === 'select' });
     this.spawnObj.on(
       'drag',
@@ -292,8 +301,8 @@ export class EditorScene extends Phaser.Scene {
         this.collector.width,
         this.collector.height
       )
-      .setFillStyle(TOOL_COLORS.collector, 0.3)
-      .setStrokeStyle(1, TOOL_COLORS.collector, 0.7)
+      .setFillStyle(COLOR_COLLECTOR, 0.32)
+      .setStrokeStyle(2, 0x2d2a4a, 0.18)
       .setInteractive({ draggable: this.currentTool === 'select' });
     this.collectorObj.on(
       'drag',
@@ -313,25 +322,41 @@ export class EditorScene extends Phaser.Scene {
         const h =
           e.height ||
           (e.kind === 'ramp' ? e.thickness || 10 : e.kind === 'delete' ? 50 : 16);
+        const fill =
+          e.kind === 'rect'
+            ? COLOR_WALL
+            : e.kind === 'ramp'
+              ? COLOR_RAMP
+              : e.kind === 'bounce'
+                ? COLOR_BOUNCE
+                : 0xa78bfa;
+        const selected = e.id === this.selectedId;
         gameObj = this.add
           .rectangle(e.x, e.y, w, h)
-          .setFillStyle(
-            e.kind === 'delete'
-              ? TOOL_COLORS.delete
-              : e.kind === 'bounce'
-                ? TOOL_COLORS.bounce
-                : TOOL_COLORS[e.kind]
-          )
-          .setStrokeStyle(e.id === this.selectedId ? 2 : 0, 0xffffff, 1);
+          .setFillStyle(fill, 0.92)
+          .setStrokeStyle(
+            selected ? 3 : 2,
+            selected ? PALETTE.selectStroke : 0x2d2a4a,
+            selected ? 1 : 0.18,
+          );
 
         if (e.kind === 'ramp' && e.angle) {
           gameObj.setRotation((e.angle * Math.PI) / 180);
         }
       } else {
+        const fill =
+          e.kind === 'multiplier' && e.multiplier !== undefined
+            ? (MULTIPLIER_COLORS[e.multiplier] ?? MULTIPLIER_FALLBACK)
+            : MULTIPLIER_FALLBACK;
+        const selected = e.id === this.selectedId;
         gameObj = this.add
-          .rectangle(e.x, e.y, 16, 16)
-          .setFillStyle(TOOL_COLORS[e.kind])
-          .setStrokeStyle(e.id === this.selectedId ? 2 : 0, 0xffffff, 1);
+          .rectangle(e.x, e.y, e.width || 90, 16)
+          .setFillStyle(fill, 0.92)
+          .setStrokeStyle(
+            selected ? 3 : 2,
+            selected ? PALETTE.selectStroke : 0x2d2a4a,
+            selected ? 1 : 0.18,
+          );
       }
 
       gameObj.setInteractive({ draggable: this.currentTool === 'select' });
@@ -467,9 +492,9 @@ export class EditorScene extends Phaser.Scene {
       </div>
       <div class="ed-section">
         <h3>Actions</h3>
-        <button id="ed-delete">Delete (Del)</button>
-        <button id="ed-play">Play</button>
-        <button id="ed-export">Export</button>
+        <button id="ed-delete" class="ed-delete">Delete (Del)</button>
+        <button id="ed-play" class="ed-play">Play</button>
+        <button id="ed-export" class="ed-export">Export</button>
       </div>
       <textarea id="ed-export-out" rows="10"></textarea>
     `;
